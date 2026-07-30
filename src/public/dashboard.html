@@ -4,51 +4,157 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitorly</title>
+    <title>Monitorly — Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Monitorly</h1>
-            <p>Monitor your server and get alerts</p>
-        </div>
-        <div class="content">
-            <div class="card">
-                <h2>Server Status</h2>
-                <div class="status-container">
-                    <div class="status-item">
-                        <div class="status-icon">
-                            <i class="fa-solid fa-circle-check"></i>
+    <div class="page">
+
+        <header class="topbar">
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <span class="brand-pulse"></span>
+                </span>
+                <span class="brand-name">Monitorly</span>
+            </div>
+            <a class="topbar-cta" href="/">&larr; All projects</a>
+        </header>
+
+        <main>
+            <section class="dash-head">
+                <div class="dash-head-top">
+                    <span class="pulse-dot" id="project-dot" aria-hidden="true"></span>
+                    <h1 class="dash-title" id="project-title">Loading&hellip;</h1>
+                    <span class="status-pill" id="project-status">&mdash;</span>
+                </div>
+                <p class="dash-sub">
+                    <span id="project-host">&mdash;</span>
+                    <span class="dash-sub-sep">&middot;</span>
+                    <span id="project-platform">&mdash;</span>
+                </p>
+            </section>
+
+            <section class="metric-grid" aria-label="System metrics">
+
+                <article class="metric-card">
+                    <div class="metric-card-head">
+                        <h2 class="metric-card-title">CPU load</h2>
+                        <span class="metric-value-lg" id="cpu-percent">&mdash;</span>
+                    </div>
+                    <div class="bar">
+                        <div class="bar-fill" id="cpu-bar" style="width: 0%;"></div>
+                    </div>
+                    <svg class="pulse-line" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
+                        <polyline id="cpu-line" points="0,20 200,20" />
+                    </svg>
+                    <div class="metric-subrow">
+                        <div class="metric-sub">
+                            <span class="metric-sub-value" id="load-1m">&mdash;</span>
+                            <span class="metric-sub-label">1m avg</span>
                         </div>
-                        <div class="status-text">
-                            <h3>Server Uptime</h3>
-                            <p>Server is running for <span id="uptime">0</span> seconds</p>
+                        <div class="metric-sub">
+                            <span class="metric-sub-value" id="load-5m">&mdash;</span>
+                            <span class="metric-sub-label">5m avg</span>
+                        </div>
+                        <div class="metric-sub">
+                            <span class="metric-sub-value" id="load-15m">&mdash;</span>
+                            <span class="metric-sub-label">15m avg</span>
+                        </div>
+                        <div class="metric-sub">
+                            <span class="metric-sub-value" id="cpu-cores">&mdash;</span>
+                            <span class="metric-sub-label">cores</span>
                         </div>
                     </div>
-                    <div class="status-item">
-                        <div class="status-icon">
-                            <i class="fa-solid fa-circle-check"></i>
+                </article>
+
+                <article class="metric-card">
+                    <div class="metric-card-head">
+                        <h2 class="metric-card-title">Memory</h2>
+                        <span class="metric-value-lg" id="mem-percent">&mdash;</span>
+                    </div>
+                    <div class="bar">
+                        <div class="bar-fill" id="mem-bar" style="width: 0%;"></div>
+                    </div>
+                    <div class="metric-subrow">
+                        <div class="metric-sub">
+                            <span class="metric-sub-value" id="mem-used">&mdash;</span>
+                            <span class="metric-sub-label">used</span>
                         </div>
-                        <div class="status-text">
-                            <h3>Total Requests</h3>
-                            <p>Total number of requests: <span id="total-requests">0</span></p>
+                        <div class="metric-sub">
+                            <span class="metric-sub-value" id="mem-free">&mdash;</span>
+                            <span class="metric-sub-label">free</span>
+                        </div>
+                        <div class="metric-sub">
+                            <span class="metric-sub-value" id="mem-total">&mdash;</span>
+                            <span class="metric-sub-label">total</span>
                         </div>
                     </div>
-                    <div class="status-item">
-                        <div class="status-icon">
-                            <i class="fa-solid fa-circle-check"></i>
+                </article>
+
+                <article class="metric-card">
+                    <div class="metric-card-head">
+                        <h2 class="metric-card-title">Uptime</h2>
+                    </div>
+                    <span class="metric-value-lg metric-value-standalone" id="uptime-value">&mdash;</span>
+                    <p class="metric-note">Since last restart</p>
+                </article>
+
+            </section>
+
+            <section class="api-section" aria-label="API metrics">
+                <h2 class="section-title">API metrics</h2>
+
+                <div class="critical-card" id="critical-card">
+                    <span class="critical-label">Most critical endpoint</span>
+                    <div class="critical-main">
+                        <span class="method-badge" id="critical-method">&mdash;</span>
+                        <span class="critical-path" id="critical-path">&mdash;</span>
+                    </div>
+                    <div class="metric-subrow">
+                        <div class="metric-sub">
+                            <span class="metric-sub-value" id="critical-error">&mdash;</span>
+                            <span class="metric-sub-label">error rate</span>
                         </div>
-                        <a href="/dashboard" class="status-text">
-                            <h3>Dashboard</h3>
-                            <p>View detailed metrics</p>
-                        </a>
+                        <div class="metric-sub">
+                            <span class="metric-sub-value" id="critical-p95">&mdash;</span>
+                            <span class="metric-sub-label">p95 response</span>
+                        </div>
+                        <div class="metric-sub">
+                            <span class="metric-sub-value" id="critical-rpm">&mdash;</span>
+                            <span class="metric-sub-label">req/min</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-        </div>
+                <div class="api-table-wrap">
+                    <table class="api-table">
+                        <thead>
+                            <tr>
+                                <th>Endpoint</th>
+                                <th>Avg</th>
+                                <th>p95</th>
+                                <th>Req/min</th>
+                                <th>Errors</th>
+                                <th>Memory</th>
+                            </tr>
+                        </thead>
+                        <tbody id="api-table-body">
+                            <tr><td colspan="6" class="api-table-loading">Loading endpoints&hellip;</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <p class="dash-footnote">
+                Last updated <span id="last-updated">&mdash;</span> &middot; refreshing every 5s
+            </p>
+        </main>
+
     </div>
-    <script src="/js/dashboard.js"></script>
+
+    <script src="/js/project-dashboard.js"></script>
 </body>
-</html> 
+</html>
