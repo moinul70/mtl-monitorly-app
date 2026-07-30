@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitorly</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Monitorly</h1>
+            <p>Monitor your server and get alerts</p>
+        </div>
+        <div class="content">
+            <div class="card">
+                <h2>Server Status</h2>
+                <div class="status-container">
+                    <div class="status-item">
+                        <div class="status-icon">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div class="status-text">
+                            <h3>Server Uptime</h3>
+                            <p>Server is running for <span id="uptime">0</span> seconds</p>
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-icon">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div class="status-text">
+                            <h3>Total Requests</h3>
+                            <p>Total number of requests: <span id="total-requests">0</span></p>
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-icon">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <a href="/dashboard" class="status-text">
+                            <h3>Dashboard</h3>
+                            <p>View detailed metrics</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="/js/dashboard.js"></script>
+</body>
+</html> 

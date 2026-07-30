@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitorly — Server monitoring</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="page">
+
+        <header class="topbar">
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <span class="brand-pulse"></span>
+                </span>
+                <span class="brand-name">Monitorly</span>
+            </div>
+            <a class="topbar-cta" href="/dashboard/new">Add a project</a>
+        </header>
+
+        <main>
+            <section class="hero">
+                <p class="eyebrow">Uptime &amp; response monitoring</p>
+                <h1>Every server, one heartbeat away.</h1>
+                <p class="hero-copy">Monitorly checks your servers around the clock and tells you the moment something looks wrong.</p>
+            </section>
+
+            <section class="projects" aria-label="Monitored projects">
+
+                <a class="card" data-status="online" href="/dashboard/project-1">
+                    <div class="card-top">
+                        <span class="pulse-dot" aria-hidden="true"></span>
+                        <h2 class="card-title">Project name-1</h2>
+                        <span class="status-pill">Online</span>
+                    </div>
+
+                    <p class="card-copy">Check the status of your server</p>
+
+                    <svg class="pulse-line" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
+                        <polyline points="0,20 200,20" />
+                    </svg>
+
+                    <div class="card-stats">
+                        <div class="stat">
+                            <span class="stat-value" data-uptime>99.98%</span>
+                            <span class="stat-label">Uptime</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" data-ping>—</span>
+                            <span class="stat-label">Response</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" data-checked>just now</span>
+                            <span class="stat-label">Last checked</span>
+                        </div>
+                    </div>
+                </a>
+
+                <a class="card" data-status="online" href="/dashboard/project-2">
+                    <div class="card-top">
+                        <span class="pulse-dot" aria-hidden="true"></span>
+                        <h2 class="card-title">Project name-2</h2>
+                        <span class="status-pill">Online</span>
+                    </div>
+
+                    <p class="card-copy">Check the status of your server</p>
+
+                    <svg class="pulse-line" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
+                        <polyline points="0,20 200,20" />
+                    </svg>
+
+                    <div class="card-stats">
+                        <div class="stat">
+                            <span class="stat-value" data-uptime>99.92%</span>
+                            <span class="stat-label">Uptime</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" data-ping>—</span>
+                            <span class="stat-label">Response</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value" data-checked>just now</span>
+                            <span class="stat-label">Last checked</span>
+                        </div>
+                    </div>
+                </a>
+
+                <a class="card card-add" href="/dashboard/new">
+                    <span class="card-add-icon" aria-hidden="true">+</span>
+                    <span class="card-add-label">Monitor a new server</span>
+                </a>
+
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>Monitorly checks in every 60 seconds, from three regions.</p>
+        </footer>
+
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
