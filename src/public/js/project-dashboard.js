@@ -175,7 +175,7 @@
 
     function init() {
         const projectId = getProjectIdFromUrl();
-
+      
         if (!projectId) {
             renderError("No project selected");
             return;
@@ -201,6 +201,9 @@
             const cpuPercentEl = document.getElementById("cpu-percent");
             const cpuBarEl = document.getElementById("cpu-bar");
             const cpuLineEl = document.getElementById("cpu-line");
+            const cpuParentEl = document.getElementById("metric-card-cpu");
+            
+            if(data.cpu.loadPercent > data.cpuThreshold) cpuParentEl.classList.add("metric-card-critical");
             if (cpuPercentEl) cpuPercentEl.textContent = `${data.cpu.loadPercent}%`;
             if (cpuBarEl) cpuBarEl.style.width = `${Math.min(100, data.cpu.loadPercent)}%`;
 
@@ -216,6 +219,8 @@
             // Memory
             const memPercentEl = document.getElementById("mem-percent");
             const memBarEl = document.getElementById("mem-bar");
+            const memParentEl = document.getElementById("metric-card-memory");
+            if(data.memory.usedPercent > data.memoryThreshold) memParentEl.classList.add("metric-card-critical");
             if (memPercentEl) memPercentEl.textContent = `${data.memory.usedPercent}%`;
             if (memBarEl) memBarEl.style.width = `${Math.min(100, data.memory.usedPercent)}%`;
 

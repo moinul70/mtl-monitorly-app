@@ -99,7 +99,9 @@ function getMetrics(projectId) {
             seconds: Math.round(os.uptime()),
             formatted: formatUptime(os.uptime())
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        cpuThreshold: process.env.CPU_THRESHOLD || 70,
+        memoryThreshold: process.env.MEMORY_THRESHOLD || 80
     };
 }
 

@@ -627,3 +627,27 @@ a {
         gap: 16px;
     }
 }
+/* Critical cards */
+@keyframes blink-red-purple {
+    0%, 100% {
+        background: rgba(239, 68, 68, 0.2); /* Deep Red */
+        box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+        border-left-color: #ef4444;
+    }
+    50% {
+        background: rgba(168, 85, 247, 0.2); /* Vibrant Purple */
+        box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+        border-left-color: #a855f7;
+    }
+}
+
+.metric-card-critical {
+    position: relative;
+    border-left-width: 4px;
+    border-left-style: solid;
+    transform: translateY(-2px);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    
+    /* Blinking red-purple animation */
+    animation: blink-red-purple 1s ease-in-out infinite;
+}
