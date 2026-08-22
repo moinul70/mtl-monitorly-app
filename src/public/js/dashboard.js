@@ -106,4 +106,142 @@
     document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".card[data-status]").forEach(initCard);
     });
+    const modal = document.getElementById('projectModal');
+const addProjectBtn = document.getElementById('addProjectBtn');
+const closeProjectModal = document.getElementById('closeProjectModal');
+
+addProjectBtn.addEventListener('click', () => {
+    modal.classList.add('active');
+
+    document.getElementById('project_name').focus();
+});
+
+closeProjectModal.addEventListener('click', () => {
+    modal.classList.remove('active');
+});
+
+modal.addEventListener('click', (event) => {
+    if (event.target === modal) {
+        modal.classList.remove('active');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadProjects();
+});
+
+
+async function loadProjects() {
+
+    const projectsContainer = document.getElementById('projects');
+
+    try {
+
+        const response = await fetch('/api/projects');
+
+        if (!response.ok) {
+            throw new Error('Failed to load projects');
+        }
+
+        const projects = await response.json();
+
+        const addCard = document.getElementById('addProjectBtn');
+
+        projects.forEach(project => {
+
+            const card = createProjectCard(project);
+
+            projectsContainer.insertBefore(card, addCard);
+
+        });
+
+    } catch (error) {
+
+        console.error('Error loading projects:', error);
+
+    }
+}
+
+
+function createProjectCard(project) {
+
+    const card = document.createElement('a');
+
+    card.className = 'card';
+    card.dataset.status = 'online';
+
+    card.href = `/dashboard/${project.project_name}`;
+
+    card.innerHTML = `
+        <div class="card-top">
+
+            <span class="pulse-dot" aria-hidden="true"></span>
+
+            <h2 class="card-title">
+                ${escapeHtml(project.project_name)}
+            </h2>
+
+            <span class="status-pill">
+                Online
+            </span>
+
+        </div>
+
+        <p class="card-copy">
+            Check the status of your server
+        </p>
+
+        <svg
+            class="pulse-line"
+            viewBox="0 0 200 40"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+        >
+            <polyline points="0,20 200,20" />
+        </svg>
+
+        <div class="card-stats">
+
+            <div class="stat">
+                <span class="stat-value">
+                    99.98%
+                </span>
+                <span class="stat-label">
+                    Uptime
+                </span>
+            </div>
+
+            <div class="stat">
+                <span class="stat-value">
+                    —
+                </span>
+                <span class="stat-label">
+                    Response
+                </span>
+            </div>
+
+            <div class="stat">
+                <span class="stat-value">
+                    just now
+                </span>
+                <span class="stat-label">
+                    Last checked
+                </span>
+            </div>
+
+        </div>
+    `;
+
+    return card;
+}
+
+
+function escapeHtml(value) {
+
+    const div = document.createElement('div');
+
+    div.textContent = value;
+
+    return div.innerHTML;
+}
 })();

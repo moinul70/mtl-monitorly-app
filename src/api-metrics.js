@@ -14,7 +14,8 @@
 
 require("dotenv").config();
 const POLL_INTERVAL_MS = 10000;
-const FETCH_TIMEOUT_MS = 5000;
+const FETCH_TIMEOUT_MS = process.env.FETCH_TIMEOUT_MS ? Number(process.env.FETCH_TIMEOUT_MS) : 5000;
+
 
 // TODO: set this to your real external API. Supports a {projectId} token,
 // e.g. "https://monitoring.example.com/v1/metrics/{projectId}"
@@ -138,7 +139,7 @@ async function getApiMetrics(projectId) {
     ensurePolling(projectId); // subsequent updates happen in the background every 10s
 
     const entry = cache.get(projectId);
-    return { ...entry.data, stale: entry.stale, lastError: entry.lastError, fetchedAt: entry.fetchedAt };
+    return { ...entry.data, stale: entry.stale, lastError: entry.lastError, fetchedAt: entry.fetchedAt, FETCH_TIMEOUT_MS };
 }
 
 module.exports = { getApiMetrics };

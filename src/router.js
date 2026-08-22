@@ -3,14 +3,48 @@ const path = require("path");
 
 const { getMetrics } = require("./system-metrics");
 const { getApiMetrics } = require("./api-metrics");
-
+const db = require('./db');
 const app = express();
 const PUBLIC_DIR = path.join(__dirname, "public");
 
 app.use(express.static(PUBLIC_DIR));
 
+app.use(express.urlencoded({ extended: true })); 
+
 app.get("/", (req, res) => {
     res.sendFile(path.join(PUBLIC_DIR, "index.html"));
+});
+
+app.post('/projects', (req, res) => {
+console.log('Received request to create project:', req.body);
+    const { project_name } = req.body;
+
+    if (!project_name || !project_name.trim()) {
+        return res.status(400).send('Project name is required');
+    }
+
+    const name = project_name.trim();
+
+    try {
+
+        const result = db.prepare(`
+            INSERT INTO projects (project_name)
+            VALUES (?)
+        `).run(name);
+
+        // Redirect to the newly created project
+        res.redirect(`/dashboard/${result.lastInsertRowid}`);
+
+    } catch (error) {
+
+        if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+            return res.status(409).send('Project name already exists');
+        }
+
+        console.error(error);
+
+        res.status(500).send('Database error');
+    }
 });
 
 // Bare /dashboard with no project id isn't a valid page — a project
@@ -23,6 +57,41 @@ app.get("/dashboard/:projectId", (req, res) => {
     // Not validated against a real project list yet — the page loads,
     // and front-end JS reads projectId from the URL to fetch its metrics.
     res.sendFile(path.join(PUBLIC_DIR, "dashboard.html"));
+});
+
+app.get('/api/projects', (req, res) => {
+    try {
+        const projects = db.prepare(`
+            SELECT id, project_name
+            FROM projects
+            ORDER BY id DESC
+        `).all();
+
+        res.json(projects);
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            message: 'Failed to load projects'
+        });
+    }
+});
+
+app.get('/dashboard/:project_name', (req, res) => {
+
+    const { project_name } = req.params;
+
+    const project = db.prepare(`
+        SELECT *
+        FROM projects
+        WHERE project_name = ?
+    `).get(project_name);
+
+    if (!project) {
+        return res.status(404).send('Project not found');
+    }
+
+    res.json(project);
 });
 
 // Metrics API — returns a JSON snapshot for one project.

@@ -29,8 +29,18 @@
                 <h1>Every server, one heartbeat away.</h1>
                 <p class="hero-copy">Monitorly checks your servers around the clock and tells you the moment something looks wrong.</p>
             </section>
+            <section class="projects" id="projects" aria-label="Monitored projects">
 
-            <section class="projects" aria-label="Monitored projects">
+    <!-- Projects will be loaded by dashboard.js -->
+
+    <a class="card card-add" href="#" id="addProjectBtn">
+        <span class="card-add-icon" aria-hidden="true">+</span>
+        <span class="card-add-label">Monitor a new server</span>
+    </a>
+
+</section>
+
+       
 
                 <a class="card" data-status="online" href="/dashboard/project-1">
                     <div class="card-top">
@@ -94,8 +104,38 @@
                     <span class="card-add-icon" aria-hidden="true">+</span>
                     <span class="card-add-label">Monitor a new server</span>
                 </a>
+                <button class="topbar-cta" id="addProjectBtn">
+    Add a project
+</button>
 
-            </section>
+            </section> -->
+            <div class="modal-overlay" id="projectModal">
+    <div class="modal">
+        <button class="modal-close" id="closeProjectModal">&times;</button>
+
+        <h2>Add a project</h2>
+        <p>Enter the name of the server you want to monitor.</p>
+
+        <form action="/projects" method="POST">
+            <div class="form-group">
+                <label for="project_name">Project name</label>
+
+                <input
+                    type="text"
+                    id="project_name"
+                    name="project_name"
+                    placeholder="My Server"
+                    required
+                    maxlength="100"
+                >
+            </div>
+
+            <button type="submit" class="submit-btn">
+                Add Project
+            </button>
+        </form>
+    </div>
+</div>
         </main>
 
         <footer class="footer">

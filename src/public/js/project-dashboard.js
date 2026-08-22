@@ -102,7 +102,7 @@
     }
 
     function renderApiMetrics(data) {
-        const { mostCritical, endpoints, stale, lastError } = data;
+        const { mostCritical, endpoints, stale, lastError, FETCH_TIMEOUT_MS } = data;
 
         const card = document.getElementById("critical-card");
         const tbody = document.getElementById("api-table-body");
@@ -131,6 +131,7 @@
         const errorEl = document.getElementById("critical-error");
         const p95El = document.getElementById("critical-p95");
         const rpmEl = document.getElementById("critical-rpm");
+        const refreshEl = document.getElementById("refresh-interval");
 
         if (methodEl) {
             methodEl.textContent = mostCritical.method;
@@ -141,6 +142,8 @@
         if (p95El) p95El.textContent = `${mostCritical.p95ResponseMs}ms`;
         if (rpmEl) rpmEl.textContent = mostCritical.requestsPerMin;
         if (card) card.dataset.level = errorRateLevel(mostCritical.errorRatePercent);
+       
+        if (refreshEl) refreshEl.textContent = FETCH_TIMEOUT_MS/1000 + "s";
 
         if (!tbody) return;
 
