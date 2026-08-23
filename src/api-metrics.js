@@ -51,7 +51,7 @@ function normalizeResponse(raw, projectId) {
 
     const endpoints = rawEndpoints.map((item) => {
         const avgResponseMs = Number(item.avgResponseMs ?? item.avgResponseTime ?? item.avg_response_ms ?? 0);
-        const p95ResponseMs = Number(item.p95ResponseMs ?? item.p95 ?? item.p95_response_ms ?? avgResponseMs);
+        const p95ResponseMs = Number(item.p95ResponseMs ?? item.p95 ?? item.response_ms ?? avgResponseMs);
         const requestsPerMin = Number(item.requestsPerMin ?? item.requestsPerMinute ?? item.requests_per_min ?? 0);
         const errorRatePercent = Number(item.errorRatePercent ?? item.errorRate ?? item.error_rate ?? 0);
         const memoryMB = Number(item.memoryMB ?? item.memoryUsageMb ?? item.memory_mb ?? 0);
@@ -132,6 +132,7 @@ function ensurePolling(projectId) {
  * requested before.
  */
 async function getApiMetrics(projectId) {
+    cache.delete(projectId);
     if (!cache.has(projectId)) {
         await refreshProjectMetrics(projectId); // first request waits for real data
     }

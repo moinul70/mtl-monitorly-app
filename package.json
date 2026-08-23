@@ -12,7 +12,9 @@
   "start": "node src/server.js",
  
    
-  "dev": "node --watch src/server.js"
+  "dev": "node --watch src/server.js",
+  "build:css": "tailwindcss -i ./src/css/input.css -o ./src/public/css/style.css --minify",
+  "watch:css": "tailwindcss -i ./src/css/input.css -o ./src/public/css/style.css --watch"
  
   },
  
@@ -27,5 +29,16 @@
    
   "express": "^5.2.1"
  
+  },
+ 
+  "devDependencies": {
+ 
+   
+  "@tailwindcss/cli": "^4.3.3",
+ 
+   
+  "tailwindcss": "^4.3.3"
+ 
   }
+
 }

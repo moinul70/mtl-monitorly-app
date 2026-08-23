@@ -74,6 +74,7 @@
 
     async function fetchMetrics(projectId) {
         const response = await fetch(`/api/metrics/${encodeURIComponent(projectId)}`);
+      
         if (!response.ok) {
             throw new Error(`Request failed with status ${response.status}`);
         }
@@ -102,7 +103,8 @@
     }
 
     function renderApiMetrics(data) {
-        const { mostCritical, endpoints, stale, lastError, FETCH_TIMEOUT_MS } = data;
+        console.log("API metrics data:", data);
+        const { projectName,mostCritical, endpoints, stale, lastError, FETCH_TIMEOUT_MS } = data;
 
         const card = document.getElementById("critical-card");
         const tbody = document.getElementById("api-table-body");

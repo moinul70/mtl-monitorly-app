@@ -106,142 +106,171 @@
     document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".card[data-status]").forEach(initCard);
     });
-    const modal = document.getElementById('projectModal');
-const addProjectBtn = document.getElementById('addProjectBtn');
-const closeProjectModal = document.getElementById('closeProjectModal');
 
-addProjectBtn.addEventListener('click', () => {
-    modal.classList.add('active');
+    // ---------------------------------------------------------------
+    // Add-project modal + project list loading
+    // ---------------------------------------------------------------
 
-    document.getElementById('project_name').focus();
-});
+    const modal = document.getElementById("projectModal");
+    const addProjectBtn = document.getElementById("addProjectBtn");
+    const closeProjectModal = document.getElementById("closeProjectModal");
+    const addProjectForm = document.getElementById("addProjectForm");
+    const projectNameInput = document.getElementById("project_name");
+    const modalError = document.getElementById("modalError");
+    const submitProjectBtn = document.getElementById("submitProjectBtn");
+    const projectsContainer = document.getElementById("projects_list");
+    const addCard = document.getElementById("projects_list_card");
 
-closeProjectModal.addEventListener('click', () => {
-    modal.classList.remove('active');
-});
-
-modal.addEventListener('click', (event) => {
-    if (event.target === modal) {
-        modal.classList.remove('active');
+    function openModal() {
+        modal.classList.add("active");
+        hideModalError();
+        projectNameInput.value = "";
+        requestAnimationFrame(() => projectNameInput.focus());
     }
-});
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadProjects();
-});
+    function closeModal() {
+        modal.classList.remove("active");
+    }
 
+    function showModalError(message) {
+        modalError.textContent = message;
+        modalError.classList.remove("hidden");
+    }
 
-async function loadProjects() {
+    function hideModalError() {
+        modalError.classList.add("hidden");
+        modalError.textContent = "";
+    }
 
-    const projectsContainer = document.getElementById('projects');
+    addProjectBtn.addEventListener("click", openModal);
+    closeProjectModal.addEventListener("click", closeModal);
+    modal.addEventListener("click", (event) => {
+        if (event.target === modal) closeModal();
+    });
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && modal.classList.contains("active")) closeModal();
+    });
 
-    try {
+    document.addEventListener("DOMContentLoaded", () => {
+        loadProjects();
+    });
 
-        const response = await fetch('/api/projects');
+    async function loadProjects() {
+        try {
+            const response = await fetch("/api/projects");
 
-        if (!response.ok) {
-            throw new Error('Failed to load projects');
+            if (!response.ok) {
+                throw new Error("Failed to load projects");
+            }
+
+            const payload = await response.json();
+
+            // Fix: the API returns { projects: [...] }, not a bare array —
+            // this unwraps it (and still tolerates a bare array if that
+            // ever changes).
+            const projects = Array.isArray(payload) ? payload : (payload.projects || []);
+
+            projects.forEach((project) => {
+                const card = createProjectCard(project);
+                projectsContainer.insertBefore(card, addCard);
+                initCard(card); // wire up the EKG animation for this card too
+            });
+        } catch (error) {
+            console.error("Error loading projects:", error);
         }
-
-        const projects = await response.json();
-
-        const addCard = document.getElementById('addProjectBtn');
-
-        projects.forEach(project => {
-
-            const card = createProjectCard(project);
-
-            projectsContainer.insertBefore(card, addCard);
-
-        });
-
-    } catch (error) {
-
-        console.error('Error loading projects:', error);
-
     }
-}
 
+    // Fix: was a plain HTML form posting to /projects with a full page
+    // reload. Now submits via fetch to /api/projects, matching the JSON
+    // API the rest of the app uses, and appends the new card without a
+    // reload.
+    addProjectForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        hideModalError();
 
-function createProjectCard(project) {
+        const name = projectNameInput.value.trim();
+        if (!name) return;
 
-    const card = document.createElement('a');
+        submitProjectBtn.disabled = true;
+        submitProjectBtn.textContent = "Adding…";
 
-    card.className = 'card';
-    card.dataset.status = 'online';
+        try {
+            const response = await fetch("/api/projects", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                },
+                body: JSON.stringify({ name }),
+            });
 
-    card.href = `/dashboard/${project.project_name}`;
+            let payload = {};
+            try {
+                payload = await response.json();
+            } catch {
+                // non-JSON error body, fall through to generic message
+            }
 
-    card.innerHTML = `
-        <div class="card-top">
+            if (!response.ok) {
+                throw new Error(payload.message || `Failed with status ${response.status}`);
+            }
 
-            <span class="pulse-dot" aria-hidden="true"></span>
+            const project = payload.project || payload;
+            const card = createProjectCard(project);
+            projectsContainer.insertBefore(card, addCard);
+            initCard(card);
 
-            <h2 class="card-title">
-                ${escapeHtml(project.project_name)}
-            </h2>
+            closeModal();
+        } catch (error) {
+            showModalError(error.message || "Something went wrong. Please try again.");
+        } finally {
+            submitProjectBtn.disabled = false;
+            submitProjectBtn.textContent = "Add Project";
+        }
+    });
 
-            <span class="status-pill">
-                Online
-            </span>
+    function createProjectCard(project) {
+        const card = document.createElement("a");
 
-        </div>
+        card.className = "card";
+        card.dataset.status = "online";
+        card.href = `/dashboard/${project.project_name}`;
 
-        <p class="card-copy">
-            Check the status of your server
-        </p>
-
-        <svg
-            class="pulse-line"
-            viewBox="0 0 200 40"
-            preserveAspectRatio="none"
-            aria-hidden="true"
-        >
-            <polyline points="0,20 200,20" />
-        </svg>
-
-        <div class="card-stats">
-
-            <div class="stat">
-                <span class="stat-value">
-                    99.98%
-                </span>
-                <span class="stat-label">
-                    Uptime
-                </span>
+        card.innerHTML = `
+            <div class="card-top">
+                <span class="pulse-dot" aria-hidden="true"></span>
+                <h2 class="card-title">${escapeHtml(project.project_name)}</h2>
+                <span class="status-pill">Online</span>
             </div>
 
-            <div class="stat">
-                <span class="stat-value">
-                    —
-                </span>
-                <span class="stat-label">
-                    Response
-                </span>
+            <p class="card-copy">Check the status of your server</p>
+
+            <svg class="pulse-line" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
+                <polyline points="0,20 200,20" />
+            </svg>
+
+            <div class="card-stats">
+                <div class="stat">
+                    <span class="stat-value">99.98%</span>
+                    <span class="stat-label">Uptime</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" data-ping>—</span>
+                    <span class="stat-label">Response</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" data-checked>just now</span>
+                    <span class="stat-label">Last checked</span>
+                </div>
             </div>
+        `;
 
-            <div class="stat">
-                <span class="stat-value">
-                    just now
-                </span>
-                <span class="stat-label">
-                    Last checked
-                </span>
-            </div>
+        return card;
+    }
 
-        </div>
-    `;
-
-    return card;
-}
-
-
-function escapeHtml(value) {
-
-    const div = document.createElement('div');
-
-    div.textContent = value;
-
-    return div.innerHTML;
-}
+    function escapeHtml(value) {
+        const div = document.createElement("div");
+        div.textContent = value;
+        return div.innerHTML;
+    }
 })();

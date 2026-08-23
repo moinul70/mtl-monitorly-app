@@ -12,11 +12,11 @@ app.use(express.static(PUBLIC_DIR));
 app.use(express.urlencoded({ extended: true })); 
 
 app.get("/", (req, res) => {
-    res.sendFile(path.join(PUBLIC_DIR, "index.html"));
+    res.sendFile(path.join(__dirname, 'views',"index.html"));
 });
 
 app.post('/projects', (req, res) => {
-console.log('Received request to create project:', req.body);
+
     const { project_name } = req.body;
 
     if (!project_name || !project_name.trim()) {
@@ -56,7 +56,7 @@ app.get("/dashboard", (req, res) => {
 app.get("/dashboard/:projectId", (req, res) => {
     // Not validated against a real project list yet — the page loads,
     // and front-end JS reads projectId from the URL to fetch its metrics.
-    res.sendFile(path.join(PUBLIC_DIR, "dashboard.html"));
+    res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
 });
 
 app.get('/api/projects', (req, res) => {

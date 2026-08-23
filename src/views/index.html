@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitorly — Server monitoring</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <!-- Compiled Tailwind output — no CDN. Rebuild with: npm run build:css -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <div class="page">
+
+        <header class="topbar">
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <span class="brand-pulse"></span>
+                </span>
+                <span class="brand-name">Monitorly</span>
+            </div>
+            <button type="button" class="topbar-cta" id="addProjectBtn">Add a project</button>
+        </header>
+
+        <main>
+            <section class="hero">
+                <p class="eyebrow">Uptime &amp; response monitoring</p>
+                <h1>Every server, one heartbeat away.</h1>
+                <p class="hero-copy">Monitorly checks your servers around the clock and tells you the moment something
+                    looks wrong.</p>
+            </section>
+
+            <section class="projects" id="projects_list" aria-label="Monitored projects">
+                <!-- Existing projects are injected here by dashboard.js -->
+
+                <a class="card-add" href="#" id="projects_list_card">
+                    <span class="card-add-icon" aria-hidden="true">+</span>
+                    <span class="card-add-label">Monitor a new server</span>
+                </a>
+            </section>
+        </main>
+
+        <div class="modal-overlay" id="projectModal">
+            <div class="modal">
+                <button type="button" class="modal-close" id="closeProjectModal" aria-label="Close">&times;</button>
+
+                <p class="mb-4 text-sm text-slate-500">Enter the name of the server you want to monitor.</p>
+
+                <p class="modal-error hidden" id="modalError"></p>
+
+                <form id="addProjectForm">
+                    <div class="form-group">
+                        <label for="project_name">Project name</label>
+                        <input type="text" id="project_name" name="project_name" placeholder="My Server" required
+                            maxlength="100" autocomplete="off">
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitProjectBtn">
+                        Add Project
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>Monitorly checks in every 60 seconds, from three regions.</p>
+        </footer>
+
+    </div>
+
+    <script src="/js/dashboard.js"></script>
+</body>
+
+</html>

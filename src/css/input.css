@@ -1,0 +1,409 @@
+@import "tailwindcss";
+
+@theme {
+  --color-coral-50: #fff1ee;
+  --color-coral-100: #ffe1da;
+  --color-coral-400: #ff8a70;
+  --color-coral-500: #ff6b4a;
+  --color-coral-600: #f0502e;
+  --color-status-online: #22c55e;
+  --color-status-degraded: #f59e0b;
+  --color-status-offline: #ef4444;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-900 font-sans antialiased;
+  }
+  h1, h2 {
+    @apply font-display;
+  }
+}
+
+@layer components {
+  /* ---------- Layout ---------- */
+  .page {
+    @apply max-w-5xl mx-auto px-6;
+  }
+
+  /* ---------- Topbar ---------- */
+  .topbar {
+    @apply flex items-center justify-between py-6;
+  }
+  .brand {
+    @apply flex items-center gap-2;
+  }
+  .brand-mark {
+    @apply relative flex h-3 w-3;
+  }
+  .brand-pulse {
+    @apply absolute inline-block h-3 w-3 rounded-full bg-coral-500 animate-pulse;
+  }
+  .brand-name {
+    @apply font-display font-semibold text-lg tracking-tight;
+  }
+  .topbar-cta {
+    @apply inline-flex items-center rounded-full bg-coral-500 px-4 py-2 text-sm font-semibold text-white
+           transition hover:bg-coral-600 cursor-pointer border-0;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    @apply py-10 max-w-xl;
+  }
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-wider text-coral-500 mb-2;
+  }
+  .hero h1 {
+    @apply text-3xl sm:text-4xl font-semibold tracking-tight mb-3;
+  }
+  .hero-copy {
+    @apply text-slate-500 text-base leading-relaxed;
+  }
+
+  /* ---------- Projects grid ---------- */
+  .projects {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-4;
+  }
+
+  /* ---------- Project card (created dynamically by dashboard.js) ---------- */
+  .card {
+    @apply block rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition
+           hover:shadow-md hover:-translate-y-0.5 no-underline text-inherit;
+  }
+  .card-top {
+    @apply flex items-center gap-2 mb-2;
+  }
+  .pulse-dot {
+    @apply h-2.5 w-2.5 rounded-full bg-status-online shrink-0;
+  }
+  .card[data-status="degraded"] .pulse-dot {
+    @apply bg-status-degraded;
+  }
+  .card[data-status="offline"] .pulse-dot {
+    @apply bg-status-offline;
+  }
+  .card-title {
+    @apply font-display text-base font-semibold flex-1 truncate;
+  }
+  .status-pill {
+    @apply text-xs font-semibold px-2 py-0.5 rounded-full bg-status-online/10 text-status-online;
+  }
+  .card[data-status="degraded"] .status-pill {
+    @apply bg-status-degraded/10 text-status-degraded;
+  }
+  .card[data-status="offline"] .status-pill {
+    @apply bg-status-offline/10 text-status-offline;
+  }
+  .card-copy {
+    @apply text-sm text-slate-500 mb-3;
+  }
+  .pulse-line {
+    @apply w-full h-10 mb-3;
+  }
+  .pulse-line polyline {
+    @apply stroke-coral-500;
+    fill: none;
+    stroke-width: 2;
+  }
+  .card-stats {
+    @apply grid grid-cols-3 gap-2 pt-3 border-t border-slate-100;
+  }
+  .stat {
+    @apply flex flex-col;
+  }
+  .stat-value {
+    @apply font-mono text-sm font-medium;
+  }
+  .stat-label {
+    @apply text-xs text-slate-400;
+  }
+
+  /* ---------- Add-project card (dashed) ---------- */
+  .card-add {
+    @apply flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed
+           border-slate-200 p-5 text-slate-400 no-underline transition
+           hover:border-coral-400 hover:text-coral-500 cursor-pointer;
+  }
+  .card-add-icon {
+    @apply text-2xl leading-none;
+  }
+  .card-add-label {
+    @apply text-sm font-medium;
+  }
+
+  /* ---------- Modal ---------- */
+  .modal-overlay {
+    @apply fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 p-4;
+  }
+  .modal-overlay.active {
+    @apply flex;
+  }
+  .modal {
+    @apply relative w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl;
+  }
+  .modal-close {
+    @apply absolute top-3 right-3 h-8 w-8 rounded-full text-slate-400 text-xl leading-none
+           transition hover:bg-slate-100 hover:text-slate-600 border-0 bg-transparent cursor-pointer;
+  }
+  .form-group {
+    @apply mb-4;
+  }
+  .form-group label {
+    @apply block text-sm font-semibold mb-1.5;
+  }
+  .form-group input {
+    @apply w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm
+           focus:outline-none focus:ring-2 focus:ring-coral-400 focus:border-transparent;
+  }
+  .modal-error {
+    @apply text-sm text-status-offline mb-3;
+  }
+  .submit-btn {
+    @apply w-full rounded-lg bg-coral-500 py-2.5 text-sm font-semibold text-white
+           transition hover:bg-coral-600 disabled:opacity-60 disabled:cursor-not-allowed
+           border-0 cursor-pointer;
+  }
+
+  /* ---------- Empty / error state ---------- */
+  .projects-empty {
+    @apply col-span-full text-center text-sm text-slate-400 py-10;
+  }
+
+  /* ---------- Footer ---------- */
+  .footer {
+    @apply py-8 text-center text-xs text-slate-400;
+  }
+}
+
+/* =========================================
+   API Table
+========================================= */
+
+.api-table-wrap {
+    @apply mt-5 overflow-hidden rounded-2xl
+           border border-white/10 bg-white/[0.02];
+}
+
+.api-table {
+    @apply w-full min-w-[700px] text-left;
+}
+
+.api-table thead {
+    @apply border-b border-white/10 bg-white/[0.02];
+}
+
+.api-table th {
+    @apply px-6 py-4 text-xs font-medium
+           uppercase tracking-wider text-zinc-600;
+}
+
+.api-table td {
+    @apply px-6 py-4 text-sm;
+}
+
+.api-table-loading {
+    @apply px-6 py-10 text-center
+           font-mono text-xs text-zinc-600;
+}
+
+
+/* =========================================
+   Footer / Last Updated
+========================================= */
+
+.dash-footnote {
+    @apply mx-6 mt-8 pb-8 text-center
+           font-mono text-[11px] text-zinc-600
+           lg:mx-8;
+}
+
+.refresh-label {
+    @apply text-zinc-600;
+}
+/* =========================================
+   Dashboard Header
+========================================= */
+
+.dash-head {
+    @apply mx-auto max-w-7xl px-6 py-10 lg:px-8;
+}
+
+.dash-head-top {
+    @apply flex flex-wrap items-center gap-3;
+}
+
+.dash-title {
+    @apply font-display text-3xl font-bold tracking-tight
+           text-black sm:text-4xl;
+}
+
+.dash-sub {
+    @apply mt-3 flex flex-wrap items-center gap-2
+           text-sm text-zinc-500;
+}
+
+.dash-sub-sep {
+    @apply text-zinc-700;
+}
+
+
+/* =========================================
+   Status
+========================================= */
+
+.pulse-dot {
+    @apply h-3 w-3 rounded-full bg-zinc-600;
+}
+
+.status-pill {
+    @apply rounded-full border border-white/10
+           bg-white/5 px-3 py-1
+           text-xs font-semibold text-zinc-400;
+}
+
+
+/* =========================================
+   Main
+========================================= */
+
+main {
+    @apply mx-auto max-w-7xl;
+}
+
+
+/* =========================================
+   Metric Grid
+========================================= */
+
+.metric-grid {
+    @apply grid gap-5 px-6 lg:grid-cols-3 lg:px-8;
+}
+
+.metric-card {
+    @apply rounded-2xl border border-white/10
+           bg-white/[0.025] p-6
+           transition hover:border-white/15;
+}
+
+.metric-card-head {
+    @apply flex items-center justify-between;
+}
+
+.metric-card-title {
+    @apply font-display text-sm font-semibold text-zinc-600;
+}
+
+.metric-value-lg {
+    @apply font-mono text-2xl font-medium text-black;
+}
+
+.metric-value-standalone {
+    @apply mt-8 block text-3xl;
+}
+
+.metric-note {
+    @apply mt-2 text-xs text-zinc-600;
+}
+
+
+/* =========================================
+   Progress Bar
+========================================= */
+
+.bar {
+    @apply mt-5 h-1.5 overflow-hidden rounded-full bg-white/5;
+}
+
+.bar-fill {
+    @apply h-full rounded-full bg-emerald-400
+           transition-all duration-500;
+}
+
+
+/* =========================================
+   Pulse Graph
+========================================= */
+
+.pulse-line {
+    @apply mt-6 h-12 w-full;
+}
+
+
+/* =========================================
+   Metric Sub Row
+========================================= */
+
+.metric-subrow {
+    @apply mt-5 grid gap-4;
+}
+
+.metric-card .metric-subrow {
+    @apply grid-cols-3;
+}
+
+.metric-card:first-child .metric-subrow {
+    @apply grid-cols-4;
+}
+
+.metric-sub {
+    @apply min-w-0;
+}
+
+.metric-sub-value {
+    @apply block font-mono text-sm text-black;
+}
+
+.metric-sub-label {
+    @apply mt-1 block text-[11px] text-zinc-600;
+}
+
+
+/* =========================================
+   API Section
+========================================= */
+
+.api-section {
+    @apply mx-auto mt-12 max-w-7xl px-6 lg:px-8;
+}
+
+.section-title {
+    @apply mb-5 font-display text-xl font-bold text-black;
+}
+
+
+/* =========================================
+   Critical Endpoint
+========================================= */
+
+.critical-card {
+    @apply rounded-2xl border border-red-400/20
+           bg-red-400/[0.025] p-6;
+}
+
+.critical-label {
+    @apply text-xs font-medium uppercase
+           tracking-wider text-red-400;
+}
+
+.critical-main {
+    @apply mt-4 flex flex-wrap items-center gap-3;
+}
+
+.method-badge {
+    @apply rounded-lg bg-white/5
+           px-2.5 py-1
+           font-mono text-xs font-semibold
+           text-zinc-600;
+}
+
+.critical-path {
+    @apply font-mono text-sm text-black;
+}
+
+.critical-card .metric-subrow {
+    @apply grid-cols-3 sm:max-w-xl;
+}
