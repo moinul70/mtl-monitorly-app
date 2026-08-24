@@ -10,10 +10,14 @@
 
     const POLL_INTERVAL_MS = 5000;
     const HISTORY_LENGTH = 24;
+    const PAGE_SIZE = 1;                         //  items per "load more" step
+
+    //  Pagination state
+    let currentVisibleCount = PAGE_SIZE;
+    let lastData = null;                         // cache last fetched data for re‑render
 
     function getProjectIdFromUrl() {
         const segments = window.location.pathname.split("/").filter(Boolean);
-        // segments = ["dashboard", "project-1"]
         return segments[1] || null;
     }
 
@@ -72,15 +76,6 @@
         if (title) title.textContent = message;
     }
 
-    async function fetchMetrics(projectId) {
-        const response = await fetch(`/api/metrics/${encodeURIComponent(projectId)}`);
-      
-        if (!response.ok) {
-            throw new Error(`Request failed with status ${response.status}`);
-        }
-        return response.json();
-    }
-
     async function fetchApiMetrics(projectId) {
         const response = await fetch(`/api/endpoints/${encodeURIComponent(projectId)}`);
         if (!response.ok) {
@@ -102,9 +97,41 @@
         return "method-other";
     }
 
-    function renderApiMetrics(data) {
-        console.log("API metrics data:", data);
-        const { projectName,mostCritical, endpoints, stale, lastError, FETCH_TIMEOUT_MS } = data;
+    // Render the "Load more" button
+    function renderLoadMoreButton(endpointsLength) {
+        const container = document.getElementById("load-more-container");
+        if (!container) return;
+
+        const total = endpointsLength;
+        const shown = Math.min(currentVisibleCount, total);
+        const remaining = total - shown;
+
+        if (remaining <= 0) {
+            container.innerHTML = `<span class="load-more-info">Showing all ${total} endpoints</span>`;
+            return;
+        }
+
+        container.innerHTML = `
+            <button id="load-more-btn" class="load-more-btn">
+                Load more (${remaining} remaining)
+            </button>
+        `;
+
+        document.getElementById("load-more-btn").addEventListener("click", function () {
+            alert('dd');
+            currentVisibleCount += PAGE_SIZE;
+            // Re‑render with the same cached data
+            if (lastData) {
+                renderApiMetrics(lastData, false);
+            }
+        });
+    }
+
+   function renderApiMetrics(data, resetPagination = true) {
+    // Store data for later re‑renders
+    lastData = data;
+
+        const { mostCritical, endpoints, stale, lastError, FETCH_TIMEOUT_MS } = data;
 
         const card = document.getElementById("critical-card");
         const tbody = document.getElementById("api-table-body");
@@ -125,6 +152,8 @@
                     stale ? "Waiting for external metrics source&hellip;" : "No endpoints to show yet."
                 }</td></tr>`;
             }
+            // Hide load more
+            renderLoadMoreButton(0);
             return;
         }
 
@@ -144,43 +173,49 @@
         if (p95El) p95El.textContent = `${mostCritical.p95ResponseMs}ms`;
         if (rpmEl) rpmEl.textContent = mostCritical.requestsPerMin;
         if (card) card.dataset.level = errorRateLevel(mostCritical.errorRatePercent);
-       
-        if (refreshEl) refreshEl.textContent = FETCH_TIMEOUT_MS/1000 + "s";
+
+        if (refreshEl) refreshEl.textContent = FETCH_TIMEOUT_MS / 1000 + "s";
 
         if (!tbody) return;
 
-        tbody.innerHTML = "";
-        endpoints
-            .slice()
-            .sort((a, b) => b.criticalScore - a.criticalScore)
-            .forEach((endpoint) => {
-                const row = document.createElement("tr");
-                const level = errorRateLevel(endpoint.errorRatePercent);
+        // Sort endpoints once (by criticalScore descending)
+        const sortedEndpoints = endpoints.slice().sort((a, b) => b.criticalScore - a.criticalScore);
 
-                row.innerHTML = `
-                    <td>
-                        <span class="method-badge ${methodClass(endpoint.method)}">${endpoint.method}</span>
-                        <span class="api-path">${endpoint.path}</span>
-                    </td>
-                    <td>${endpoint.avgResponseMs}ms</td>
-                    <td>${endpoint.p95ResponseMs}ms</td>
-                    <td>${endpoint.requestsPerMin}</td>
-                    <td class="error-cell error-${level}">${endpoint.errorRatePercent}%</td>
-                    <td>${endpoint.memoryMB} MB</td>
-                `;
-                tbody.appendChild(row);
-            });
+        // Slice based on currentVisibleCount
+        const visibleEndpoints = sortedEndpoints.slice(0, currentVisibleCount);
+
+        tbody.innerHTML = "";
+        visibleEndpoints.forEach((endpoint) => {
+            const row = document.createElement("tr");
+            const level = errorRateLevel(endpoint.errorRatePercent);
+
+            row.innerHTML = `
+                <td>
+                    <span class="method-badge ${methodClass(endpoint.method)}">${endpoint.method}</span>
+                    <span class="api-path">${endpoint.path}</span>
+                </td>
+                <td>${endpoint.avgResponseMs}ms</td>
+                <td>${endpoint.p95ResponseMs}ms</td>
+                <td>${endpoint.requestsPerMin}</td>
+                <td class="error-cell error-${level}">${endpoint.errorRatePercent}%</td>
+                <td>${endpoint.memoryMB} MB</td>
+            `;
+            tbody.appendChild(row);
+        });
 
         if (stale) {
             const note = document.createElement("tr");
             note.innerHTML = `<td colspan="6" class="api-table-loading">Showing last known data — external source unreachable (${lastError})</td>`;
             tbody.appendChild(note);
         }
+
+        // Render the load‑more button (or "all shown" message)
+        renderLoadMoreButton(sortedEndpoints.length);
     }
 
     function init() {
         const projectId = getProjectIdFromUrl();
-      
+
         if (!projectId) {
             renderError("No project selected");
             return;
@@ -191,62 +226,14 @@
         const titleEl = document.getElementById("project-title");
         if (titleEl) titleEl.textContent = humanizeProjectId(projectId);
 
-        const cpuHistory = Array(HISTORY_LENGTH).fill(0);
         let lastUpdatedAt = Date.now();
-
-        function applyMetrics(data) {
-            setStatus(data.status);
-
-            const hostEl = document.getElementById("project-host");
-            const platformEl = document.getElementById("project-platform");
-            if (hostEl) hostEl.textContent = data.hostname;
-            if (platformEl) platformEl.textContent = data.platform;
-
-            // CPU
-            const cpuPercentEl = document.getElementById("cpu-percent");
-            const cpuBarEl = document.getElementById("cpu-bar");
-            const cpuLineEl = document.getElementById("cpu-line");
-            const cpuParentEl = document.getElementById("metric-card-cpu");
-            
-            if(data.cpu.loadPercent > data.cpuThreshold) cpuParentEl.classList.add("metric-card-critical");
-            if (cpuPercentEl) cpuPercentEl.textContent = `${data.cpu.loadPercent}%`;
-            if (cpuBarEl) cpuBarEl.style.width = `${Math.min(100, data.cpu.loadPercent)}%`;
-
-            cpuHistory.shift();
-            cpuHistory.push(data.cpu.loadPercent);
-            if (cpuLineEl) cpuLineEl.setAttribute("points", buildPolyline(cpuHistory));
-
-            document.getElementById("load-1m").textContent = data.cpu.loadAverage["1m"];
-            document.getElementById("load-5m").textContent = data.cpu.loadAverage["5m"];
-            document.getElementById("load-15m").textContent = data.cpu.loadAverage["15m"];
-            document.getElementById("cpu-cores").textContent = data.cpu.cores;
-
-            // Memory
-            const memPercentEl = document.getElementById("mem-percent");
-            const memBarEl = document.getElementById("mem-bar");
-            const memParentEl = document.getElementById("metric-card-memory");
-            if(data.memory.usedPercent > data.memoryThreshold) memParentEl.classList.add("metric-card-critical");
-            if (memPercentEl) memPercentEl.textContent = `${data.memory.usedPercent}%`;
-            if (memBarEl) memBarEl.style.width = `${Math.min(100, data.memory.usedPercent)}%`;
-
-            document.getElementById("mem-used").textContent = `${data.memory.usedGB} GB`;
-            document.getElementById("mem-free").textContent = `${data.memory.freeGB} GB`;
-            document.getElementById("mem-total").textContent = `${data.memory.totalGB} GB`;
-
-            // Uptime
-            document.getElementById("uptime-value").textContent = data.uptime.formatted;
-
-            lastUpdatedAt = Date.now();
-        }
 
         async function poll() {
             try {
-                const [systemData, apiData] = await Promise.all([
-                    fetchMetrics(projectId),
+                const [apiData] = await Promise.all([
                     fetchApiMetrics(projectId)
                 ]);
-                applyMetrics(systemData);
-                renderApiMetrics(apiData);
+                renderApiMetrics(apiData, true);
             } catch (err) {
                 renderError("Unable to load project metrics");
                 console.error(err);

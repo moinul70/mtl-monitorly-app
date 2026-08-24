@@ -36,6 +36,9 @@
                     looks wrong.</p>
             </section>
 
+        <%- include('system-metrics') %>
+
+        </br>
             <section class="projects" id="projects_list" aria-label="Monitored projects">
                 <!-- Existing projects are injected here by dashboard.js -->
 
@@ -45,6 +48,7 @@
                 </a>
             </section>
         </main>
+          
 
         <div class="modal-overlay" id="projectModal">
             <div class="modal">
@@ -75,6 +79,7 @@
     </div>
 
     <script src="/js/dashboard.js"></script>
+    <!-- <script src="/js/metrics.js"></script> -->
 </body>
 
 </html>

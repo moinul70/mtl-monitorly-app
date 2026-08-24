@@ -5,6 +5,10 @@ const { getMetrics } = require("./system-metrics");
 const { getApiMetrics } = require("./api-metrics");
 const db = require('./db');
 const app = express();
+
+
+app.set('view engine', 'ejs');
+app.set('views', './src/views');
 const PUBLIC_DIR = path.join(__dirname, "public");
 
 app.use(express.static(PUBLIC_DIR));
@@ -12,7 +16,7 @@ app.use(express.static(PUBLIC_DIR));
 app.use(express.urlencoded({ extended: true })); 
 
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, 'views',"index.html"));
+    res.render('index');
 });
 
 app.post('/projects', (req, res) => {
@@ -56,7 +60,7 @@ app.get("/dashboard", (req, res) => {
 app.get("/dashboard/:projectId", (req, res) => {
     // Not validated against a real project list yet — the page loads,
     // and front-end JS reads projectId from the URL to fetch its metrics.
-    res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
+    res.render('project-dashboard');
 });
 
 app.get('/api/projects', (req, res) => {
@@ -95,11 +99,9 @@ app.get('/dashboard/:project_name', (req, res) => {
 });
 
 // Metrics API — returns a JSON snapshot for one project.
-app.get("/api/metrics/:projectId", (req, res) => {
-    const { projectId } = req.params;
-
+app.get("/system-metrics", (req, res) => {
     try {
-        const metrics = getMetrics(projectId);
+        const metrics = getMetrics();
         res.json(metrics);
     } catch (err) {
         res.status(500).json({ error: "Failed to read system metrics" });

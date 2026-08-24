@@ -49,8 +49,8 @@ function bytesToGB(bytes) {
  * agent, SSH check, or a metrics DB) once that exists. The shape of the
  * returned object is what the front end depends on, so keep it stable.
  */
-function getMetrics(projectId) {
-    const seed = hashString(projectId) % 1000;
+function getMetrics() {
+    const seed = hashString('dd') % 1000;
 
     const cpuCount = os.cpus().length;
     const [load1, load5, load15] = os.loadavg();
@@ -76,7 +76,6 @@ function getMetrics(projectId) {
     }
 
     return {
-        projectId,
         status,
         hostname: os.hostname(),
         platform: `${os.platform()} (${os.arch()})`,

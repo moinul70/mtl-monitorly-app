@@ -15,6 +15,8 @@
     const HISTORY_LENGTH = 24;
     const CHECK_INTERVAL_MS = 3200;
     const STATUS_ORDER = ["online", "online", "online", "online", "degraded", "offline"];
+     const POLL_INTERVAL_MS = 5000;
+    
 
     /**
      * Turns an array of ping values (ms) into an SVG polyline `points` string
@@ -273,4 +275,126 @@
         div.textContent = value;
         return div.innerHTML;
     }
+
+    
+function renderError(message) {
+        const title = document.getElementById("project-title");
+        if (title) title.textContent = message;
+    }
+    function setStatus(status) {
+        const dot = document.getElementById("project-dot");
+        const pill = document.getElementById("project-status");
+        const card = document.querySelector(".dash-head-top");
+
+        if (card) card.dataset.status = status;
+        if (dot) dot.style.setProperty("--status", `var(--${statusColorVar(status)})`);
+        if (pill) {
+            pill.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+            pill.style.color = `var(--${statusColorVar(status)})`;
+            pill.style.background = `var(--${statusColorVar(status)}-dim)`;
+        }
+    }
+
+    function statusColorVar(status) {
+        if (status === "degraded") return "warn";
+        if (status === "offline") return "bad";
+        return "good";
+    }
+async function fetchMetrics() {
+        const response = await fetch(`/system-metrics`);
+      
+        if (!response.ok) {
+            throw new Error(`Request failed with status ${response.status}`);
+        }
+        return response.json();
+    }
+   function init() {
+
+        // document.title = `Monitorly — ${humanizeProjectId(projectId)}`;
+
+         const titleEl = document.getElementById("project-title");
+         if (titleEl) titleEl.textContent = 'my-project';
+
+        const cpuHistory = Array(HISTORY_LENGTH).fill(0);
+        let lastUpdatedAt = Date.now();
+
+        function applyMetrics(data) {
+            setStatus(data.status);
+
+            const hostEl = document.getElementById("system-host");
+            const platformEl = document.getElementById("project-platform");
+            if (hostEl) hostEl.textContent = data.hostname;
+            if (platformEl) platformEl.textContent = data.platform;
+
+            // CPU
+            const cpuPercentEl = document.getElementById("cpu-percent");
+            const cpuBarEl = document.getElementById("cpu-bar");
+            const cpuLineEl = document.getElementById("cpu-line");
+            const cpuParentEl = document.getElementById("metric-card-cpu");
+            if (cpuParentEl) {
+    cpuParentEl.classList.toggle(
+        "metric-card-critical",
+        data.cpu.loadPercent > data.cpuThreshold
+    );
+}
+            // if(data.cpu.loadPercent > data.cpuThreshold) cpuParentEl.classList.add("metric-card-critical");
+            if (cpuPercentEl) cpuPercentEl.textContent = `${data.cpu.loadPercent}%`;
+            if (cpuBarEl) cpuBarEl.style.width = `${Math.min(100, data.cpu.loadPercent)}%`;
+
+            cpuHistory.shift();
+            cpuHistory.push(data.cpu.loadPercent);
+            if (cpuLineEl) cpuLineEl.setAttribute("points", buildPolyline(cpuHistory));
+
+            document.getElementById("load-1m").textContent = data.cpu.loadAverage["1m"];
+            document.getElementById("load-5m").textContent = data.cpu.loadAverage["5m"];
+            document.getElementById("load-15m").textContent = data.cpu.loadAverage["15m"];
+            document.getElementById("cpu-cores").textContent = data.cpu.cores;
+
+            // Memory
+            const memPercentEl = document.getElementById("mem-percent");
+            const memBarEl = document.getElementById("mem-bar");
+            const memParentEl = document.getElementById("metric-card-memory");
+            if (memParentEl) {
+    memParentEl.classList.toggle(
+        "metric-card-critical",
+        data.memory.usedPercent > data.memoryThreshold
+    );
+}
+            // if(data.memory.usedPercent > data.memoryThreshold) memParentEl.classList.add("metric-card-critical");
+            if (memPercentEl) memPercentEl.textContent = `${data.memory.usedPercent}%`;
+            if (memBarEl) memBarEl.style.width = `${Math.min(100, data.memory.usedPercent)}%`;
+
+            document.getElementById("mem-used").textContent = `${data.memory.usedGB} GB`;
+            document.getElementById("mem-free").textContent = `${data.memory.freeGB} GB`;
+            document.getElementById("mem-total").textContent = `${data.memory.totalGB} GB`;
+
+            // Uptime
+            document.getElementById("uptime-value").textContent = data.uptime.formatted;
+
+            lastUpdatedAt = Date.now();
+        }
+
+        async function poll() {
+            try {
+                 const [systemData] = await Promise.all([
+                    fetchMetrics(),
+                ]);
+                applyMetrics(systemData);
+            } catch (err) {
+                renderError("Unable to load project metrics");
+                console.error(err);
+            }
+        }
+
+        setInterval(() => {
+            const elapsed = Math.floor((Date.now() - lastUpdatedAt) / 1000);
+            const lastUpdatedEl = document.getElementById("last-updated");
+            if (lastUpdatedEl) lastUpdatedEl.textContent = formatRelativeTime(elapsed);
+        }, 1000);
+
+        poll();
+        setInterval(poll, POLL_INTERVAL_MS);
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
 })();

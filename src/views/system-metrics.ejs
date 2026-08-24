@@ -1,0 +1,76 @@
+<section class="metric-grid" aria-label="System metrics">
+    <div class="card-header text-color-slate-500">
+        <span class="card-title">Host name:</span>
+        <h1 class="card-title" id="system-host">Loading&hellip;</h1>
+    </div>
+</section>
+<section class="metric-grid" aria-label="System metrics">
+
+    <div class="card">
+        <article class="metric-card" id="metric-card-cpu">
+            <div class="metric-card-head">
+                <h2 class="metric-card-title">CPU load</h2>
+                <span class="metric-value-lg" id="cpu-percent">&mdash;</span>
+            </div>
+            <div class="bar">
+                <div class="bar-fill" id="cpu-bar" style="width: 0%;"></div>
+            </div>
+            <svg class="pulse-line" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
+                <polyline id="cpu-line" points="0,20 200,20" />
+            </svg>
+            <div class="metric-subrow">
+                <div class="metric-sub">
+                    <span class="metric-sub-value" id="load-1m">&mdash;</span>
+                    <span class="metric-sub-label">1m avg</span>
+                </div>
+                <div class="metric-sub">
+                    <span class="metric-sub-value" id="load-5m">&mdash;</span>
+                    <span class="metric-sub-label">5m avg</span>
+                </div>
+                <div class="metric-sub">
+                    <span class="metric-sub-value" id="load-15m">&mdash;</span>
+                    <span class="metric-sub-label">15m avg</span>
+                </div>
+                <div class="metric-sub">
+                    <span class="metric-sub-value" id="cpu-cores">&mdash;</span>
+                    <span class="metric-sub-label">cores</span>
+                </div>
+            </div>
+        </article>
+    </div>
+    <div class="card">
+        <article class="metric-card" id="metric-card-memory">
+            <div class="metric-card-head">
+                <h2 class="metric-card-title">Memory</h2>
+                <span class="metric-value-lg" id="mem-percent">&mdash;</span>
+            </div>
+            <div class="bar">
+                <div class="bar-fill" id="mem-bar" style="width: 0%;"></div>
+            </div>
+            <div class="metric-subrow">
+                <div class="metric-sub">
+                    <span class="metric-sub-value" id="mem-used">&mdash;</span>
+                    <span class="metric-sub-label">used</span>
+                </div>
+                <div class="metric-sub">
+                    <span class="metric-sub-value" id="mem-free">&mdash;</span>
+                    <span class="metric-sub-label">free</span>
+                </div>
+                <div class="metric-sub">
+                    <span class="metric-sub-value" id="mem-total">&mdash;</span>
+                    <span class="metric-sub-label">total</span>
+                </div>
+            </div>
+        </article>
+    </div>
+    <div class="card">
+        <article class="metric-card">
+            <div class="metric-card-head">
+                <h2 class="metric-card-title">Uptime</h2>
+            </div>
+            <span class="metric-value-lg metric-value-standalone" id="uptime-value">&mdash;</span>
+            <p class="metric-note">Since last restart</p>
+        </article>
+
+    </div>
+</section>

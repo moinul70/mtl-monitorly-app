@@ -30,80 +30,14 @@
                     <h1 class="dash-title" id="project-title">Loading&hellip;</h1>
                     <span class="status-pill" id="project-status">&mdash;</span>
                 </div>
-                <p class="dash-sub">
+                <!-- <p class="dash-sub">
                     <span id="project-host">&mdash;</span>
                     <span class="dash-sub-sep">&middot;</span>
                     <span id="project-platform">&mdash;</span>
-                </p>
+                </p> -->
             </section>
 
-            <section class="metric-grid" aria-label="System metrics">
-
-                <article class="metric-card" id="metric-card-cpu">
-                    <div class="metric-card-head">
-                        <h2 class="metric-card-title">CPU load</h2>
-                        <span class="metric-value-lg" id="cpu-percent">&mdash;</span>
-                    </div>
-                    <div class="bar">
-                        <div class="bar-fill" id="cpu-bar" style="width: 0%;"></div>
-                    </div>
-                    <svg class="pulse-line" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
-                        <polyline id="cpu-line" points="0,20 200,20" />
-                    </svg>
-                    <div class="metric-subrow">
-                        <div class="metric-sub">
-                            <span class="metric-sub-value" id="load-1m">&mdash;</span>
-                            <span class="metric-sub-label">1m avg</span>
-                        </div>
-                        <div class="metric-sub">
-                            <span class="metric-sub-value" id="load-5m">&mdash;</span>
-                            <span class="metric-sub-label">5m avg</span>
-                        </div>
-                        <div class="metric-sub">
-                            <span class="metric-sub-value" id="load-15m">&mdash;</span>
-                            <span class="metric-sub-label">15m avg</span>
-                        </div>
-                        <div class="metric-sub">
-                            <span class="metric-sub-value" id="cpu-cores">&mdash;</span>
-                            <span class="metric-sub-label">cores</span>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="metric-card" id="metric-card-memory">
-                    <div class="metric-card-head">
-                        <h2 class="metric-card-title">Memory</h2>
-                        <span class="metric-value-lg" id="mem-percent">&mdash;</span>
-                    </div>
-                    <div class="bar">
-                        <div class="bar-fill" id="mem-bar" style="width: 0%;"></div>
-                    </div>
-                    <div class="metric-subrow">
-                        <div class="metric-sub">
-                            <span class="metric-sub-value" id="mem-used">&mdash;</span>
-                            <span class="metric-sub-label">used</span>
-                        </div>
-                        <div class="metric-sub">
-                            <span class="metric-sub-value" id="mem-free">&mdash;</span>
-                            <span class="metric-sub-label">free</span>
-                        </div>
-                        <div class="metric-sub">
-                            <span class="metric-sub-value" id="mem-total">&mdash;</span>
-                            <span class="metric-sub-label">total</span>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="metric-card">
-                    <div class="metric-card-head">
-                        <h2 class="metric-card-title">Uptime</h2>
-                    </div>
-                    <span class="metric-value-lg metric-value-standalone" id="uptime-value">&mdash;</span>
-                    <p class="metric-note">Since last restart</p>
-                </article>
-
-            </section>
-
+                 <!-- <%- include('system-metrics') %> -->
             <section class="api-section" aria-label="API metrics">
                 <h2 class="section-title">API metrics</h2>
 
@@ -145,6 +79,7 @@
                             <tr><td colspan="6" class="api-table-loading">Loading endpoints&hellip;</td></tr>
                         </tbody>
                     </table>
+                    <div id="load-more-container" class="load-more-container"></div>
                 </div>
             </section>
 
@@ -154,7 +89,7 @@
         </main>
 
     </div>
-
+<!-- <script src="/js/metrics.js"></script> -->
     <script src="/js/project-dashboard.js"></script>
 </body>
 </html>
