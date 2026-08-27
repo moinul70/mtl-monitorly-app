@@ -6,7 +6,7 @@ const { getApiMetrics } = require("./api-metrics");
 const db = require('./db');
 const app = express();
 
-
+app.use(express.json());
 app.set('view engine', 'ejs');
 app.set('views', './src/views');
 const PUBLIC_DIR = path.join(__dirname, "public");
@@ -42,7 +42,7 @@ app.post('/projects', (req, res) => {
     } catch (error) {
 
         if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
-            return res.status(409).send('Project name already exists');
+            return res.status(409).json({ errormessage: 'Project name already exists' });
         }
 
         console.error(error);
@@ -77,6 +77,27 @@ app.get('/api/projects', (req, res) => {
 
         res.status(500).json({
             message: 'Failed to load projects'
+        });
+    }
+});
+app.delete('/api/projects/:projectId', async (req, res) => {
+    const { projectId } = req.params;
+    try {
+        const deleteProject = db.prepare(`
+            DELETE FROM projects
+            WHERE id = ?
+        `).run(projectId);
+
+        if (!deleteProject) {
+            return res.status(404).json({ message: 'Project not found' });
+        }
+
+        res.json({ message: 'Project deleted successfully' });
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            message: 'Failed to delete project'
         });
     }
 });
