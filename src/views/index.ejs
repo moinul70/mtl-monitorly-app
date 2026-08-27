@@ -25,7 +25,7 @@
                 </span>
                 <span class="brand-name">Monitorly</span>
             </div>
-            <button type="button" class="topbar-cta" id="addProjectBtn">Add a project</button>
+            <!-- <button type="button" class="topbar-cta" id="addProjectBtn">Add a project</button> -->
         </header>
 
         <main>
@@ -42,9 +42,9 @@
             <section class="projects" id="projects_list" aria-label="Monitored projects">
                 <!-- Existing projects are injected here by dashboard.js -->
 
-                <a class="card-add" href="#" id="projects_list_card">
+                <a class="card-add addProjectBtn" href="#" id="projects_list_card">
                     <span class="card-add-icon" aria-hidden="true">+</span>
-                    <span class="card-add-label">Monitor a new server</span>
+                    <span class="card-add-label">Add a project</span>
                 </a>
             </section>
         </main>
@@ -64,6 +64,11 @@
                         <input type="text" id="project_name" name="project_name" placeholder="My Server" required
                             maxlength="100" autocomplete="off">
                     </div>
+                    <div class="form-group">
+                        <label for="project_base_url">Project base URL</label>
+                        <input type="text" id="project_base_url" name="project_base_url" placeholder="https://my-server.com" required
+                            maxlength="200" autocomplete="off">
+                    </div>
 
                     <button type="submit" class="submit-btn" id="submitProjectBtn">
                         Add Project
@@ -73,13 +78,12 @@
         </div>
 
         <footer class="footer">
-            <p>Monitorly checks in every 60 seconds, from three regions.</p>
+            <p>Monitorly checks in every <span class="refresh-time"></span> seconds. Made by <a href="https://github.com/moinul70/mtl-monitorly-app">Moinul Tech Lab</a></p>
         </footer>
 
     </div>
 
-    <script src="/js/dashboard.js"></script>
-    <!-- <script src="/js/metrics.js"></script> -->
+    <script type="module" src="/js/dashboard.js"></script>
 </body>
 
 </html>

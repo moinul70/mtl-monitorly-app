@@ -9,14 +9,15 @@
  * fetch to your Node.js monitoring API when it's ready.
  */
 
+
 (function () {
     "use strict";
 
     const HISTORY_LENGTH = 24;
     const CHECK_INTERVAL_MS = 3200;
     const STATUS_ORDER = ["online", "online", "online", "online", "degraded", "offline"];
-     const POLL_INTERVAL_MS = 5000;
-    
+    let FETCH_TIMEOUT_MS = 5000;
+     
 
     /**
      * Turns an array of ping values (ms) into an SVG polyline `points` string
@@ -114,10 +115,11 @@
     // ---------------------------------------------------------------
 
     const modal = document.getElementById("projectModal");
-    const addProjectBtn = document.getElementById("addProjectBtn");
+    const addProjectBtn = document.querySelector(".addProjectBtn");
     const closeProjectModal = document.getElementById("closeProjectModal");
     const addProjectForm = document.getElementById("addProjectForm");
     const projectNameInput = document.getElementById("project_name");
+    const projectBaseUrlInput = document.getElementById("project_base_url");
     const modalError = document.getElementById("modalError");
     const submitProjectBtn = document.getElementById("submitProjectBtn");
     const projectsContainer = document.getElementById("projects_list");
@@ -128,6 +130,7 @@
         modal.classList.add("active");
         hideModalError();
         projectNameInput.value = "";
+        projectBaseUrlInput.value = "";
         requestAnimationFrame(() => projectNameInput.focus());
     }
 
@@ -148,7 +151,7 @@
     addProjectBtn.addEventListener("click", openModal);
     closeProjectModal.addEventListener("click", closeModal);
     modal.addEventListener("click", (event) => {
-        if (event.target === modal) closeModal();
+        //if (event.target === modal) closeModal();
     });
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && modal.classList.contains("active")) closeModal();
@@ -169,12 +172,16 @@
             const payload = await response.json();
 
             const projects = Array.isArray(payload) ? payload : (payload.projects || []);
+            FETCH_TIMEOUT_MS = payload.fetch_time_out;
 
             projects.forEach((project) => {
                 const card = createProjectCard(project);
                 projectsContainer.insertBefore(card, addCard);
                 initCard(card);
             });
+             const refreshEl = document.querySelector(".refresh-time");
+      if (refreshEl) refreshEl.textContent = FETCH_TIMEOUT_MS / 1000;
+    
         } catch (error) {
             console.error("Error loading projects:", error);
         }
@@ -185,6 +192,8 @@
         hideModalError();
 
         const project_name = projectNameInput.value.trim();
+        if (!project_name) return;
+        const project_base_url = projectBaseUrlInput.value.trim();
         if (!project_name) return;
 
         submitProjectBtn.disabled = true;
@@ -197,7 +206,7 @@
                     "Content-Type": "application/json",
                     "Accept": "application/json",
                 },
-                body: JSON.stringify({ project_name }),
+                body: JSON.stringify({ project_name, project_base_url }),
             });
 
             let payload = {};
@@ -241,7 +250,7 @@
        
             <div class="card-top flex items-center gap-2 w-full">
   <span class="pulse-dot w-2.5 h-2.5 rounded-full bg-green-500 inline-block"></span>
-    <a class="hover:underline text-wrap flex-1 min-w-0" href="/dashboard/${encodeURIComponent(project.project_name)}">
+    <a class="hover:underline text-wrap flex-1 min-w-0" href="/dashboard/${encodeURIComponent(project.project_name)}/${encodeURIComponent(project.project_base_url)}">
         <h2 class="card-title text-lg font-semibold text-gray-800 break-words leading-tight max-w-md">
             ${escapeHtml(project.project_name)}
         </h2>
@@ -261,7 +270,7 @@
     <polyline points="0,20 200,20" />
 </svg>
 
-<a href="/dashboard/${encodeURIComponent(project.project_name)}" class="card-stats-link">
+<a href="/dashboard/${encodeURIComponent(project.project_name)}/${encodeURIComponent(project.project_base_url)}" class="card-stats-link">
     <div class="card-stats">
         <div class="stat">
             <span class="stat-value">99.98%</span>
@@ -405,7 +414,7 @@ async function fetchMetrics() {
         }, 1000);
 
         poll();
-        setInterval(poll, POLL_INTERVAL_MS);
+        setInterval(poll, FETCH_TIMEOUT_MS);
     }
   document.addEventListener('DOMContentLoaded', () => {
    

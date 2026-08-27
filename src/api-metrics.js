@@ -17,19 +17,14 @@ const POLL_INTERVAL_MS = 10000;
 const FETCH_TIMEOUT_MS = process.env.FETCH_TIMEOUT_MS ? Number(process.env.FETCH_TIMEOUT_MS) : 5000;
 
 
-// TODO: set this to your real external API. Supports a {projectId} token,
-// e.g. "https://monitoring.example.com/v1/metrics/{projectId}"
-const EXTERNAL_API_BASE_URL =
-    process.env.EXTERNAL_METRICS_API_URL || "https://your-monitoring-service.example.com/metrics/{projectId}";
-
 // projectId -> { data, fetchedAt, stale, lastError }
 const cache = new Map();
 
 // projectId -> interval handle, so we only ever poll each project once
 const pollers = new Map();
 
-function buildUrl(projectId) {
-    return EXTERNAL_API_BASE_URL+'/'+encodeURIComponent(projectId);
+function buildUrl(projectId, projectBaseUrl) {
+    return projectBaseUrl+'/api/metrics/'+encodeURIComponent(projectId);
 }
 
 /**
@@ -83,12 +78,12 @@ function normalizeResponse(raw, projectId) {
     };
 }
 
-async function fetchFromExternalApi(projectId) {
+async function fetchFromExternalApi(projectId,projectBaseUrl) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-console.log(`Fetching external metrics for project ${projectId} from ${buildUrl(projectId)}`);
+console.log(buildUrl(projectId,projectBaseUrl),projectId,projectBaseUrl);
     try {
-        const response = await fetch(buildUrl(projectId), { signal: controller.signal });
+        const response = await fetch(buildUrl(projectId,projectBaseUrl), { signal: controller.signal });
 
         if (!response.ok) {
             throw new Error(`External API responded with ${response.status}`);
@@ -102,9 +97,9 @@ console.log(`Fetching external metrics for project ${projectId} from ${buildUrl(
     }
 }
 
-async function refreshProjectMetrics(projectId) {
+async function refreshProjectMetrics(projectId,projectBaseUrl) {
     try {
-        const data = await fetchFromExternalApi(projectId);
+        const data = await fetchFromExternalApi(projectId,projectBaseUrl);
         cache.set(projectId, { data, fetchedAt: Date.now(), stale: false, lastError: null });
     } catch (err) {
         const existing = cache.get(projectId);
@@ -119,10 +114,10 @@ async function refreshProjectMetrics(projectId) {
     }
 }
 
-function ensurePolling(projectId) {
+function ensurePolling(projectId,projectBaseUrl) {
     if (pollers.has(projectId)) return;
 
-    const interval = setInterval(() => refreshProjectMetrics(projectId), POLL_INTERVAL_MS);
+    const interval = setInterval(() => refreshProjectMetrics(projectId,projectBaseUrl), POLL_INTERVAL_MS);
     pollers.set(projectId, interval);
 }
 
@@ -131,13 +126,13 @@ function ensurePolling(projectId) {
  * fetch (and starting its recurring poll) if this project hasn't been
  * requested before.
  */
-async function getApiMetrics(projectId) {
+async function getApiMetrics(projectId, projectBaseUrl) {
     cache.delete(projectId);
     if (!cache.has(projectId)) {
-        await refreshProjectMetrics(projectId); // first request waits for real data
+        await refreshProjectMetrics(projectId,projectBaseUrl); // first request waits for real data
     }
 
-    ensurePolling(projectId); // subsequent updates happen in the background every 10s
+    ensurePolling(projectId,projectBaseUrl); // subsequent updates happen in the background every 10s
 
     const entry = cache.get(projectId);
     return { ...entry.data, stale: entry.stale, lastError: entry.lastError, fetchedAt: entry.fetchedAt, FETCH_TIMEOUT_MS };

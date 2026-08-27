@@ -21,23 +21,28 @@ app.get("/", (req, res) => {
 
 app.post('/projects', (req, res) => {
 
-    const { project_name } = req.body;
+    const { project_name, project_base_url } = req.body;
 
     if (!project_name || !project_name.trim()) {
         return res.status(400).send('Project name is required');
     }
 
+    if (!project_base_url || !project_base_url.trim()) {
+        return res.status(400).send('Project base URL is required');
+    }
+
     const name = project_name.trim();
+    const baseUrl = decodeURIComponent(project_base_url);
 
     try {
 
         const result = db.prepare(`
-            INSERT INTO projects (project_name)
-            VALUES (?)
-        `).run(name);
+            INSERT INTO projects (project_name, project_base_url)
+            VALUES (?, ?)
+        `).run(name, baseUrl);
 
         // Redirect to the newly created project
-        res.redirect(`/dashboard/${result.lastInsertRowid}`);
+        res.redirect(`/dashboard/${result.lastInsertRowid}/${encodeURIComponent(baseUrl)}`);
 
     } catch (error) {
 
@@ -51,13 +56,12 @@ app.post('/projects', (req, res) => {
     }
 });
 
-// Bare /dashboard with no project id isn't a valid page — a project
-// is always required.
+
 app.get("/dashboard", (req, res) => {
     res.status(400).send("A project id is required, e.g. /dashboard/project-1");
 });
 
-app.get("/dashboard/:projectId", (req, res) => {
+app.get("/dashboard/:projectId/:projectBaseUrl", (req, res) => {
     // Not validated against a real project list yet — the page loads,
     // and front-end JS reads projectId from the URL to fetch its metrics.
     res.render('project-dashboard');
@@ -66,12 +70,12 @@ app.get("/dashboard/:projectId", (req, res) => {
 app.get('/api/projects', (req, res) => {
     try {
         const projects = db.prepare(`
-            SELECT id, project_name
+            SELECT id, project_name, project_base_url
             FROM projects
             ORDER BY id DESC
         `).all();
 
-        res.json(projects);
+        res.json({'projects':projects,'fetch_time_out':process.env.FETCH_TIMEOUT_MS});
     } catch (error) {
         console.error(error);
 
@@ -102,22 +106,22 @@ app.delete('/api/projects/:projectId', async (req, res) => {
     }
 });
 
-app.get('/dashboard/:project_name', (req, res) => {
+// app.get('/dashboard/:project_name', (req, res) => {
 
-    const { project_name } = req.params;
+//     const { project_name } = req.params;
 
-    const project = db.prepare(`
-        SELECT *
-        FROM projects
-        WHERE project_name = ?
-    `).get(project_name);
+//     const project = db.prepare(`
+//         SELECT *
+//         FROM projects
+//         WHERE project_name = ?
+//     `).get(project_name);
 
-    if (!project) {
-        return res.status(404).send('Project not found');
-    }
+//     if (!project) {
+//         return res.status(404).send('Project not found');
+//     }
 
-    res.json(project);
-});
+//     res.json(project);
+// });
 
 // Metrics API — returns a JSON snapshot for one project.
 app.get("/system-metrics", (req, res) => {
@@ -132,16 +136,19 @@ app.get("/system-metrics", (req, res) => {
 // API-level metrics — response times, memory, error rates per endpoint.
 // Backed by an external monitoring API, polled every 10s and cached
 // in api-metrics.js — this just serves whatever's currently cached.
-app.get("/api/endpoints/:projectId", async (req, res) => {
-    const { projectId } = req.params;
+app.get("/api/endpoints/:projectId/:projectBaseUrl", async (req, res) => {
+    const { projectId, projectBaseUrl } = req.params;
+    const baseUrl=decodeURIComponent(projectBaseUrl);
 
     try {
-        const data = await getApiMetrics(projectId);
+        const data = await getApiMetrics(projectId, baseUrl);
         res.json(data);
     } catch (err) {
         res.status(502).json({ error: "External metrics source unavailable" });
     }
 });
+
+
 
 app.use((req, res) => {
     res.status(404).send("404 Page Not Found");

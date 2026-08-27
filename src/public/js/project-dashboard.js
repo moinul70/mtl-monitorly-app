@@ -10,7 +10,7 @@
 
     const POLL_INTERVAL_MS = 5000;
     const HISTORY_LENGTH = 24;
-    const PAGE_SIZE = 1;                         //  items per "load more" step
+    const PAGE_SIZE = 10;                         //  items per "load more" step
 
     //  Pagination state
     let currentVisibleCount = PAGE_SIZE;
@@ -19,6 +19,10 @@
     function getProjectIdFromUrl() {
         const segments = window.location.pathname.split("/").filter(Boolean);
         return segments[1] || null;
+    }
+    function getProjectBaseUrlFromUrl() {
+        const segments = window.location.pathname.split("/").filter(Boolean);
+        return segments[2] || null;
     }
 
     function humanizeProjectId(projectId) {
@@ -76,8 +80,8 @@
         if (title) title.textContent = message;
     }
 
-    async function fetchApiMetrics(projectId) {
-        const response = await fetch(`/api/endpoints/${encodeURIComponent(projectId)}`);
+    async function fetchApiMetrics(projectId,projectBaseUrl) {
+        const response = await fetch(`/api/endpoints/${encodeURIComponent(projectId)}/${encodeURIComponent(projectBaseUrl)}`);
         if (!response.ok) {
             throw new Error(`Request failed with status ${response.status}`);
         }
@@ -215,9 +219,14 @@
 
     function init() {
         const projectId = getProjectIdFromUrl();
+        const projectBaseUrl = getProjectBaseUrlFromUrl();
 
         if (!projectId) {
             renderError("No project selected");
+            return;
+        }
+        if (!projectBaseUrl) {
+            renderError("No base url selected");
             return;
         }
 
@@ -231,7 +240,7 @@
         async function poll() {
             try {
                 const [apiData] = await Promise.all([
-                    fetchApiMetrics(projectId)
+                    fetchApiMetrics(projectId,projectBaseUrl)
                 ]);
                 renderApiMetrics(apiData, true);
             } catch (err) {
