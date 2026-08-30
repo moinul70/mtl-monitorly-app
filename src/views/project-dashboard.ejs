@@ -54,33 +54,91 @@
                         </div>
                         <div class="metric-sub">
                             <span class="metric-sub-value" id="critical-p95">&mdash;</span>
-                            <span class="metric-sub-label">p95 response</span>
+                            <span class="metric-sub-label">response</span>
                         </div>
                         <div class="metric-sub">
                             <span class="metric-sub-value" id="critical-rpm">&mdash;</span>
-                            <span class="metric-sub-label">req/min</span>
+                            <span class="metric-sub-label">memory</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="api-table-wrap">
-                    <table class="api-table">
-                        <thead>
-                            <tr>
-                                <th>Endpoint</th>
-                                <th>Avg</th>
-                                <th>p95</th>
-                                <th>Req/min</th>
-                                <th>Errors</th>
-                                <th>Memory</th>
-                            </tr>
-                        </thead>
-                        <tbody id="api-table-body">
-                            <tr><td colspan="6" class="api-table-loading">Loading endpoints&hellip;</td></tr>
-                        </tbody>
-                    </table>
-                    <div id="load-more-container" class="load-more-container"></div>
-                </div>
+                <div class="api-table-wrap overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
+                    <div class="mb-5 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+
+    <div class="grid grid-cols-2 divide-x divide-white/10 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+
+        <!-- Average Response -->
+        <div class="pr-5">
+            <p class="text-xs font-medium uppercase tracking-wider text-zinc-500">
+                Average Response
+            </p>
+
+            <p
+                id="api-avg-response"
+                class="mt-2 font-mono text-2xl font-semibold text-blue-300">
+                —
+            </p>
+        </div>
+
+        <!-- Error Rate -->
+        <div class="pl-5">
+            <p class="text-xs font-medium uppercase tracking-wider text-zinc-500">
+                Error Rate
+            </p>
+
+            <p
+                id="api-error-rate"
+                class="mt-2 font-mono text-2xl font-semibold text-red-500">
+                —
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+ <div class="w-full overflow-x-auto bg-white">
+    <table class="api-table min-w-[900px] w-full text-left">
+        <thead>
+            <tr>
+                <th class="whitespace-nowrap px-4 py-4 text-xs font-medium uppercase tracking-wider text-gray-600">
+                    Endpoint
+                </th>
+                <th class="whitespace-nowrap px-4 py-4 text-xs font-medium uppercase tracking-wider text-gray-600">
+                    Peak Memory
+                </th>
+                <th class="whitespace-nowrap px-4 py-4 text-xs font-medium uppercase tracking-wider text-gray-600">
+                    Response
+                </th>
+                <th class="whitespace-nowrap px-4 py-4 text-xs font-medium uppercase tracking-wider text-gray-600">
+                    User Agent
+                </th>
+                <th class="whitespace-nowrap px-4 py-4 text-xs font-medium uppercase tracking-wider text-gray-600">
+                    Status
+                </th>
+                <th class="whitespace-nowrap px-4 py-4 text-xs font-medium uppercase tracking-wider text-gray-600">
+                    Memory
+                </th>
+            </tr>
+        </thead>
+
+        <tbody id="api-table-body" class="bg-gray-50">
+            <tr>
+                <td colspan="6" class="px-6 py-10 text-center font-mono text-sm text-gray-800">
+                    Loading endpoints&hellip;
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+    <div
+        id="load-more-container"
+        class="flex justify-center border-t border-white/5 px-4 py-4">
+    </div>
+
+</div>
             </section>
 
             <p class="dash-footnote">

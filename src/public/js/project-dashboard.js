@@ -135,7 +135,7 @@
     // Store data for later re‑renders
     lastData = data;
 
-        const { mostCritical, endpoints, stale, lastError, FETCH_TIMEOUT_MS } = data;
+        const { mostCritical, endpoints, stale, lastError, FETCH_TIMEOUT_MS,avgResponseMs,errorRatePercent } = data;
 
         const card = document.getElementById("critical-card");
         const tbody = document.getElementById("api-table-body");
@@ -167,6 +167,8 @@
         const p95El = document.getElementById("critical-p95");
         const rpmEl = document.getElementById("critical-rpm");
         const refreshEl = document.getElementById("refresh-interval");
+        const avgResponseEl = document.getElementById("api-avg-response");
+        const errorRateEl = document.getElementById("api-error-rate");
 
         if (methodEl) {
             methodEl.textContent = mostCritical.method;
@@ -174,13 +176,15 @@
         }
         if (pathEl) pathEl.textContent = mostCritical.path;
         if (errorEl) errorEl.textContent = `${mostCritical.errorRatePercent}%`;
-        if (p95El) p95El.textContent = `${mostCritical.p95ResponseMs}ms`;
-        if (rpmEl) rpmEl.textContent = mostCritical.requestsPerMin;
+        if (p95El) p95El.textContent = `${mostCritical.responseMs}ms`;
+        if (rpmEl) rpmEl.textContent = mostCritical.memoryMB;
         if (card) card.dataset.level = errorRateLevel(mostCritical.errorRatePercent);
 
         if (refreshEl) refreshEl.textContent = FETCH_TIMEOUT_MS / 1000 + "s";
 
         if (!tbody) return;
+        avgResponseEl.textContent = avgResponseMs + "ms";
+        errorRateEl.textContent = errorRatePercent + "%";
 
         // Sort endpoints once (by criticalScore descending)
         const sortedEndpoints = endpoints.slice().sort((a, b) => b.criticalScore - a.criticalScore);
@@ -191,21 +195,51 @@
         tbody.innerHTML = "";
         visibleEndpoints.forEach((endpoint) => {
             const row = document.createElement("tr");
-            const level = errorRateLevel(endpoint.errorRatePercent);
+            
 
             row.innerHTML = `
-                <td>
-                    <span class="method-badge ${methodClass(endpoint.method)}">${endpoint.method}</span>
-                    <span class="api-path">${endpoint.path}</span>
-                </td>
-                <td>${endpoint.avgResponseMs}ms</td>
-                <td>${endpoint.p95ResponseMs}ms</td>
-                <td>${endpoint.requestsPerMin}</td>
-                <td class="error-cell error-${level}">${endpoint.errorRatePercent}%</td>
-                <td>${endpoint.memoryMB} MB</td>
-            `;
+    <td class="whitespace-nowrap px-4 py-4">
+        <div class="flex items-center gap-2">
+            <span class="method-badge ${methodClass(endpoint.method)}">
+                ${(endpoint.method)}
+            </span>
+
+            <span class="api-path max-w-[280px] truncate">
+                ${(endpoint.path)}
+            </span>
+        </div>
+    </td>
+
+    <td class="whitespace-nowrap px-4 py-4 font-mono text-sm text-zinc-500">
+        ${endpoint.peakMemoryMb ?? "—"} MB
+    </td>
+
+    <td class="whitespace-nowrap px-4 py-4 font-mono text-sm text-zinc-500">
+        ${endpoint.responseMs ?? "—"}ms
+    </td>
+
+
+    <td class="max-w-[300px] px-4 py-4 text-sm text-zinc-400">
+        <span
+            class="block max-w-[300px] truncate"
+            title="${(endpoint.userAgent)}">
+            ${(endpoint.userAgent || "—")}
+        </span>
+    </td>
+
+    <td class="whitespace-nowrap px-4 py-4">
+        <span class="rounded-full bg-white/5 px-2.5 py-1 font-mono text-xs text-zinc-500">
+            ${endpoint.statusCode ?? "—"}
+        </span>
+    </td>
+
+    <td class="whitespace-nowrap px-4 py-4 font-mono text-sm text-zinc-500">
+        ${endpoint.memoryMB ?? "—"} MB
+    </td>
+`;
             tbody.appendChild(row);
         });
+        
 
         if (stale) {
             const note = document.createElement("tr");

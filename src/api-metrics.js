@@ -30,10 +30,19 @@ function buildUrl(projectId, projectBaseUrl) {
 /**
  * Weighs error rate heaviest, then tail latency, then traffic volume.
  */
-function criticalityScore({ errorRatePercent, p95ResponseMs, requestsPerMin }) {
-    return errorRatePercent * 5 + p95ResponseMs / 50 + requestsPerMin / 100;
+function criticalityScore({
+    errorRatePercent = 0,
+    responseMs = 0,
+    peakMemoryMb = 0,
+    memoryMB = 0
+}) {
+    return (
+        errorRatePercent * 5 +
+        responseMs / 50 +
+        peakMemoryMb / 10 +
+        memoryMB / 10
+    );
 }
-
 /**
  * Maps the external API's response into the shape the dashboard expects.
  *
@@ -45,19 +54,21 @@ function normalizeResponse(raw, projectId) {
     const rawEndpoints = Array.isArray(raw?.endpoints) ? raw.endpoints : Array.isArray(raw) ? raw : [];
 
     const endpoints = rawEndpoints.map((item) => {
-        const avgResponseMs = Number(item.avgResponseMs ?? item.avgResponseTime ?? item.avg_response_ms ?? 0);
-        const p95ResponseMs = Number(item.p95ResponseMs ?? item.p95 ?? item.response_ms ?? avgResponseMs);
-        const requestsPerMin = Number(item.requestsPerMin ?? item.requestsPerMinute ?? item.requests_per_min ?? 0);
-        const errorRatePercent = Number(item.errorRatePercent ?? item.errorRate ?? item.error_rate ?? 0);
-        const memoryMB = Number(item.memoryMB ?? item.memoryUsageMb ?? item.memory_mb ?? 0);
+        const avgResponseMs = Number(item.avgResponseMs ?? 0);
+        const peakMemoryMb = Number(item.peak_memory_mb ??  0);
+        const responseMs = Number(item.response_ms ??  0);
+        const errorRatePercent = Number(item.errorRatePercent ?? 0);
+        const memoryMB = Number(item.memory_mb ?? 0);
 
         const endpoint = {
             method: item.method ?? "GET",
             path: item.path ?? item.endpoint ?? "unknown",
             avgResponseMs,
-            p95ResponseMs,
-            requestsPerMin,
+            peakMemoryMb,
+            responseMs,
             errorRatePercent,
+            userAgent: item.user_agent ?? "unknown",
+            statusCode: item.status_code ?? 0,
             memoryMB
         };
 
@@ -65,15 +76,22 @@ function normalizeResponse(raw, projectId) {
         return endpoint;
     });
 
-    const mostCritical =
-        endpoints.length > 0
-            ? endpoints.reduce((worst, ep) => (ep.criticalScore > worst.criticalScore ? ep : worst), endpoints[0])
-            : null;
+    const mostCritical = endpoints.length
+        ? endpoints.reduce((worst, endpoint) =>
+            endpoint.criticalScore > worst.criticalScore
+                ? endpoint
+                : worst
+        )
+        : null;
+        const avgResponseMs = raw.avgResponseMs;
+        const errorRatePercent = raw.errorRatePercent;
 
     return {
         projectId,
         endpoints,
         mostCritical,
+        avgResponseMs,
+        errorRatePercent,
         timestamp: new Date().toISOString()
     };
 }
@@ -81,7 +99,7 @@ function normalizeResponse(raw, projectId) {
 async function fetchFromExternalApi(projectId,projectBaseUrl) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-console.log(buildUrl(projectId,projectBaseUrl),projectId,projectBaseUrl);
+
     try {
         const response = await fetch(buildUrl(projectId,projectBaseUrl), { signal: controller.signal });
 
@@ -90,7 +108,7 @@ console.log(buildUrl(projectId,projectBaseUrl),projectId,projectBaseUrl);
         }
 
         const raw = await response.json();
-        console.log(`Fetched external metrics for project ${projectId}:`, raw);
+        // console.log(`Fetched external metrics for project ${projectId}:`, raw);
         return normalizeResponse(raw, projectId);
     } finally {
         clearTimeout(timeout);
