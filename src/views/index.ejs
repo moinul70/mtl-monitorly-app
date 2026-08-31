@@ -1,20 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitorly — Server monitoring</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
-        rel="stylesheet">
-    <!-- Compiled Tailwind output — no CDN. Rebuild with: npm run build:css -->
-    <link rel="stylesheet" href="/css/style.css">
-</head>
-
+<%- include('common-header') %>
 <body>
     <div class="page">
 
@@ -23,14 +10,14 @@
                 <span class="brand-mark" aria-hidden="true">
                     <span class="brand-pulse"></span>
                 </span>
-                <span class="brand-name">Monitorly</span>
+                <a class="brand-name" href="/">Monitorly</a>
             </div>
-            <!-- <button type="button" class="topbar-cta" id="addProjectBtn">Add a project</button> -->
+           
         </header>
 
         <main>
             <section class="hero">
-                <p class="eyebrow">Uptime &amp; response monitoring</p>
+                <p class="eyebrow">Uptime, System &amp; response monitoring</p>
                 <h1>Every server, one heartbeat away.</h1>
                 <p class="hero-copy">Monitorly checks your servers around the clock and tells you the moment something
                     looks wrong.</p>

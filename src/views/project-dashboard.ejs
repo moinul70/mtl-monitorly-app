@@ -1,19 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitorly — Dashboard</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css">
-</head>
-
+<%- include('common-header') %>
 <body>
     <div class="page">
 
@@ -22,7 +10,7 @@
                 <span class="brand-mark" aria-hidden="true">
                     <span class="brand-pulse"></span>
                 </span>
-                <span class="brand-name">Monitorly</span>
+                <a class="brand-name" href="/">Monitorly</a>
             </div>
             <a class="topbar-cta" href="/">&larr; All projects</a>
         </header>
@@ -34,11 +22,7 @@
                     <h1 class="dash-title" id="project-title">Loading&hellip;</h1>
                     <span class="status-pill" id="project-status">&mdash;</span>
                 </div>
-                <!-- <p class="dash-sub">
-                    <span id="project-host">&mdash;</span>
-                    <span class="dash-sub-sep">&middot;</span>
-                    <span id="project-platform">&mdash;</span>
-                </p> -->
+              
             </section>
 
             <!-- <%- include('system-metrics') %> -->
