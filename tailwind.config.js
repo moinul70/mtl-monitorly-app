@@ -34,6 +34,7 @@ module.exports = {
       animation: {
         "pulse-dot": "pulse-dot 1.8s ease-in-out infinite",
       },
+      
     },
   },
   plugins: [],

@@ -175,7 +175,7 @@
 
   /* ---------- Footer ---------- */
   .footer {
-    @apply py-8 text-center text-xs text-slate-400;
+    @apply py-8 text-center text-sm text-slate-600;
   }
 }
 
@@ -217,7 +217,7 @@
 
 .dash-footnote {
     @apply mx-6 mt-8 pb-8 text-center
-           font-mono text-[11px] text-zinc-600
+           font-mono text-[18px] text-zinc-600
            lg:mx-8;
 }
 
@@ -257,6 +257,14 @@
 
 .pulse-dot {
     @apply h-3 w-3 rounded-full bg-zinc-600;
+}
+
+.blink-red {
+    animation: blinkRed 1s ease-in-out infinite;
+}
+@keyframes blinkRed {
+    0%, 100% { background-color: rgba(239, 68, 68, 0.8); }
+    50% { background-color: rgba(239, 68, 68, 0.2); }
 }
 
 .status-pill {

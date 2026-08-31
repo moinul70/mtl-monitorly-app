@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,9 +8,12 @@
     <title>Monitorly — Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
 </head>
+
 <body>
     <div class="page">
 
@@ -37,7 +41,7 @@
                 </p> -->
             </section>
 
-                 <!-- <%- include('system-metrics') %> -->
+            <!-- <%- include('system-metrics') %> -->
             <section class="api-section" aria-label="API metrics">
                 <h2 class="section-title">API metrics</h2>
 
@@ -49,8 +53,8 @@
                     </div>
                     <div class="metric-subrow">
                         <div class="metric-sub">
-                            <span class="metric-sub-value" id="critical-error">&mdash;</span>
-                            <span class="metric-sub-label">error rate</span>
+                            <span class="metric-sub-value" id="status-code">&mdash;</span>
+                            <span class="metric-sub-label">status code</span>
                         </div>
                         <div class="metric-sub">
                             <span class="metric-sub-value" id="critical-p95">&mdash;</span>
@@ -66,87 +70,94 @@
                 <div class="api-table-wrap overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
                     <div class="mb-5 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
 
-    <div class="grid grid-cols-2 divide-x divide-white/10 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+                        <div
+                            class="grid grid-cols-2 divide-x divide-white/10 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
 
-        <!-- Average Response -->
-        <div class="pr-5">
-            <p class="text-xs font-medium uppercase tracking-wider text-zinc-500">
-                Average Response
-            </p>
+                            <!-- Average Response -->
+                            <div class="pr-5">
+                                <p class="text-xs font-medium uppercase tracking-wider text-zinc-500">
+                                    Average Response
+                                </p>
 
-            <p
-                id="api-avg-response"
-                class="mt-2 font-mono text-2xl font-semibold text-blue-300">
-                —
-            </p>
-        </div>
+                                <p id="api-avg-response" class="mt-2 font-mono text-2xl font-semibold text-emerald-500">
+                                </p>
+                                —
+                                </p>
+                            </div>
 
-        <!-- Error Rate -->
-        <div class="pl-5">
-            <p class="text-xs font-medium uppercase tracking-wider text-zinc-500">
-                Error Rate
-            </p>
+                            <!-- Error Rate -->
+                            <div class="pl-5">
+                                <p class="text-xs font-medium uppercase tracking-wider text-zinc-500">
+                                    Avarage Error Rate
+                                </p>
 
-            <p
-                id="api-error-rate"
-                class="mt-2 font-mono text-2xl font-semibold text-red-500">
-                —
-            </p>
-        </div>
+                                <p id="api-error-rate" class="mt-2 font-mono text-2xl font-semibold text-red-500">
+                                    —
+                                </p>
+                            </div>
 
-    </div>
+                        </div>
 
-</div>
+                    </div>
 
- <div class="w-full overflow-x-auto bg-white">
-    <table class="api-table min-w-[900px] w-full text-left">
-        <thead>
-            <tr>
-                <th class="whitespace-nowrap px-4 py-4 text-xs font-medium uppercase tracking-wider text-gray-600">
-                    Endpoint
-                </th>
-                <th class="whitespace-nowrap px-4 py-4 text-xs font-medium uppercase tracking-wider text-gray-600">
-                    Peak Memory
-                </th>
-                <th class="whitespace-nowrap px-4 py-4 text-xs font-medium uppercase tracking-wider text-gray-600">
-                    Response
-                </th>
-                <th class="whitespace-nowrap px-4 py-4 text-xs font-medium uppercase tracking-wider text-gray-600">
-                    User Agent
-                </th>
-                <th class="whitespace-nowrap px-4 py-4 text-xs font-medium uppercase tracking-wider text-gray-600">
-                    Status
-                </th>
-                <th class="whitespace-nowrap px-4 py-4 text-xs font-medium uppercase tracking-wider text-gray-600">
-                    Memory
-                </th>
-            </tr>
-        </thead>
+                    <div class="w-full overflow-x-auto bg-white">
+                        <table class="api-table min-w-[900px] w-full text-left">
+                            <thead>
+                                <tr>
+                                    <th
+                                        class="whitespace-nowrap px-4 py-4 text-xs font-medium uppercase tracking-wider text-gray-600">
+                                        Endpoint
+                                    </th>
+                                    <th
+                                        class="whitespace-nowrap px-4 py-4 text-xs font-medium uppercase tracking-wider text-gray-600">
+                                        Peak Memory
+                                    </th>
+                                    <th
+                                        class="whitespace-nowrap px-4 py-4 text-xs font-medium uppercase tracking-wider text-gray-600">
+                                        Response
+                                    </th>
+                                    <th
+                                        class="whitespace-nowrap px-4 py-4 text-xs font-medium uppercase tracking-wider text-gray-600">
+                                        User Agent
+                                    </th>
+                                    <th
+                                        class="whitespace-nowrap px-4 py-4 text-xs font-medium uppercase tracking-wider text-gray-600">
+                                        Status
+                                    </th>
+                                    <th
+                                        class="whitespace-nowrap px-4 py-4 text-xs font-medium uppercase tracking-wider text-gray-600">
+                                        Memory
+                                    </th>
+                                </tr>
+                            </thead>
 
-        <tbody id="api-table-body" class="bg-gray-50">
-            <tr>
-                <td colspan="6" class="px-6 py-10 text-center font-mono text-sm text-gray-800">
-                    Loading endpoints&hellip;
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+                            <tbody id="api-table-body" class="bg-gray-50">
+                                <tr>
+                                    <td colspan="6" class="px-6 py-10 text-center font-mono text-sm text-gray-800">
+                                        Loading endpoints&hellip;
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-    <div
-        id="load-more-container"
-        class="flex justify-center border-t border-white/5 px-4 py-4">
-    </div>
+                    <div id="load-more-container" class="flex justify-center border-t border-white/5 px-4 py-4">
+                    </div>
 
-</div>
+                </div>
             </section>
 
             <p class="dash-footnote">
-                Last updated <span id="last-updated">&mdash;</span> &middot; <span class="refresh-label">refreshing every</span> <span id="refresh-interval"></span>
+                Last updated <span id="last-updated">&mdash;</span> &middot; <span class="refresh-label">refreshing
+                    every</span> <span id="refresh-interval"></span>
             </p>
+            <footer class="footer">
+            <p> Made by <a class="underline underline-offset-2 hover:text-blue-600 transition-colors duration-200" href="https://github.com/moinul70">Moinul Tech Lab</a></p>
+        </footer>
         </main>
 
     </div>
     <script src="/js/project-dashboard.js"></script>
 </body>
+
 </html>
